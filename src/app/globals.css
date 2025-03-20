@@ -1,0 +1,87 @@
+:root {
+  --primary-color: #0151B0;
+  --text-color: #333;
+  --light-bg: #f8f9fa;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.primary-btn {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.6em 1.3em;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  transition: all 300ms;
+}
+
+.primary-btn:hover {
+  background-color: rgb(10, 101, 236);
+}
+
+.secondary-btn {
+  background-color: transparent;
+  color: var(--primary-color);
+  padding: 0.6em 1.3em;
+  border-radius: 50px;
+  border: 1px solid var(--primary-color);
+  cursor: pointer;
+  transition: all 300ms;
+}
+
+.secondary-btn:hover {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.section-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 3rem;
+  color: rgb(8, 8, 8);
+}
+
+@media screen and (max-width: 576px) {
+  .section-title {
+    font-size: 2rem;
+  }
+}
+
+.react-tel-input .form-control {
+  display: block !important;
+  width: 100% !important;
+  padding: .375rem 3rem !important;
+  box-shadow: none !important;
+  min-height: 50px !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  line-height: 1.5 !important;
+  color: #171717 !important;
+  background: none !important;
+  border: 1px solid #D9D9D9 !important;
+  border-radius: 50px !important;
+  transition: border-color 0.15s !important;
+}
+
+.react-tel-input .form-control:focus{
+  border: 1px solid var(--primary-color) !important;
+  box-shadow: none;
+}
+
+.react-tel-input .flag-dropdown {
+  border: 0 !important;
+  background-color: transparent !important;
+}
+
+.react-tel-input .flag-dropdown.open {
+  background-color: transparent !important;
+}
+
+.react-tel-input .flag-dropdown.open:focus{
+  box-shadow: none;
+}

@@ -1,0 +1,45 @@
+.testimonials {
+  padding: 4rem 0;
+}
+
+.sectionTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.testimonialCard {
+  padding: 2rem;
+  border-radius: 1rem;
+  background-color: #f8f9fa;
+  height: 100%;
+}
+
+.quote {
+  font-style: italic;
+  margin-bottom: 1.5rem;
+  color: #495057;
+}
+
+.userInfo {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  margin-right: 1rem;
+}
+
+.userName {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.userRole {
+  color: #6c757d;
+  font-size: 0.875rem;
+}

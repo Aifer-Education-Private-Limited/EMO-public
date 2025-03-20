@@ -1,0 +1,40 @@
+.card{
+  transition: all 0.3s;
+  /* max-width: 40px; */
+  box-shadow: 0px 3px 12px #0062ff2e;
+  padding: 2em;
+}
+
+.card:hover{
+  transform: translateY(-3px);
+}
+
+.features {
+  padding: 4rem 0;
+  text-align: center;
+}
+
+.sectionTitle {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 3rem;
+  color: black;
+}
+
+.featureIcon {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin-bottom: 1.3rem;
+}
+
+.featureTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.7rem;
+  color: black;
+}
+
+.featureText {
+  color: #6c757d;
+  font-size: 1rem;
+}

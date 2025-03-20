@@ -1,0 +1,51 @@
+.footer {
+  background-color: #101928;
+  color: white;
+  padding: 4rem 0 2rem;
+}
+
+.logo {
+  height: 32px;
+  width: auto;
+  margin-bottom: 1rem;
+}
+
+.description {
+  color: #a0a0a0;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.link {
+  color: #a0a0a0;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.link:hover {
+  color: white;
+}
+
+.copyright {
+  color: #a0a0a0;
+  font-size: 0.875rem;
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid #333;
+}
+
+.socialLinks {
+  display: flex;
+  gap: 1rem;
+}
+
+.socialIcon {
+  color: #a0a0a0;
+  font-size: 1.5rem;
+}
