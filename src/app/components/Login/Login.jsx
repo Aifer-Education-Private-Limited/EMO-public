@@ -14,6 +14,7 @@ import { fetchUserById } from "@/app/constants/features/user";
 import { useRouter } from "next/navigation";
 import { PiKeyDuotone } from "react-icons/pi";
 import { createErpLeadAndUpdate } from "@/app/constants/ErpApi";
+import { FaEye, FaEyeSlash } from "react-icons/fa6";
 
 const auth = getAuth(app)
 
@@ -24,6 +25,7 @@ const Login = ({ handleClose, URL }) => {
 
     const [error, setError] = useState("")
     const [loading, setLoading] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
 
     const [isOtpSignin, setIsOtpSignin] = useState(true);
     const [channel, setChannel] = useState("SMS");
@@ -410,10 +412,10 @@ const Login = ({ handleClose, URL }) => {
 
     const handleForgetPassword = (event) => {
         event.preventDefault();
-    
+
         try {
             setLoading(true);
-    
+
             sendPasswordResetEmail(auth, email)
                 .then(() => {
                     setIsEmailSend(true);
@@ -429,13 +431,13 @@ const Login = ({ handleClose, URL }) => {
                 .finally(() => {
                     setLoading(false);
                 });
-    
+
         } catch (err) {
             setError("Unexpected error occurred.");
             setLoading(false);
         }
     };
-    
+
 
     useEffect(() => {
         document.body.style.overflow = "hidden";
@@ -444,6 +446,7 @@ const Login = ({ handleClose, URL }) => {
 
     useEffect(() => {
         setError("")
+        setLoading(false)
     }, [isOtpSignin, isEmailSignin, channel, email, password, confirmPass, otp, mobile]);
 
     return (
@@ -453,12 +456,40 @@ const Login = ({ handleClose, URL }) => {
 
                 <div className="text-center">
                     <img src="/emo-logo.png" alt="Emo" style={{ height: "40px", width: "auto" }} />
-                    {!showForgetPass &&
+                    {isOtpSignin && (
                         <>
-                            <h3 className="mt-3 fw-bold">Login or Register</h3>
-                            <p className="text-muted fw-medium" style={{ fontSize: "14px" }}>Enter your Mobile number or Email ID to get a one time password as SMS or an email to get signed in or register in Emo.</p>
-                        </>}
-
+                            <h3 className="mt-3 fw-bold">
+                                {isOtpSend ? "Verify Your OTP" : "Sign in with OTP"}
+                            </h3>
+                            <p className="text-muted fw-medium" style={{ fontSize: "14px" }}>
+                                {isOtpSend
+                                    ? "Enter the one-time password sent to your mobile to complete the sign-in process."
+                                    : `Enter your mobile number to receive a one-time password via ${channel === "SMS" ? "SMS" : "WhatsApp"} for secure sign-in.`}
+                            </p>
+                        </>
+                    )}
+                    {isEmailSignin && <>
+                        <h3 className="mt-3 fw-bold">Sign in with Email</h3>
+                        <p className="text-muted fw-medium" style={{ fontSize: "14px" }}>Enter your email and password to access your Emo account.</p>
+                    </>}
+                    {isEmailSignup && !signupSecond && originalMethod === "EMAIL" && (
+                        <>
+                            <h3 className="mt-3 fw-bold">Create Your Emo Account</h3>
+                            <p className="text-muted fw-medium" style={{ fontSize: "14px" }}>
+                                Sign up with your email, set a password, and get started with Emo.
+                            </p>
+                        </>
+                    )}
+                    {signupSecond && (
+                        <>
+                            <h3 className="mt-3 fw-bold">Create Your Emo Account</h3>
+                            <p className="text-muted fw-medium" style={{ fontSize: "14px" }}>
+                                {originalMethod === "EMAIL"
+                                    ? "Enter your name, mobile, and state to complete signup."
+                                    : "Enter your name, email, and state to complete signup."}
+                            </p>
+                        </>
+                    )}
                     {showForgetPass && !isEmailSend && <>
                         <h3 className="mt-3 fw-bold">Reset Password <PiKeyDuotone /> </h3>
                         <p className="text-muted fw-medium" style={{ fontSize: "14px" }}>Enter your email, and we'll send you instructions to reset your password.</p>
@@ -475,7 +506,7 @@ const Login = ({ handleClose, URL }) => {
                     {!isOtpSend ?
                         <form className="my-4" onSubmit={handleOtpSend}>
                             <div className="mb-3">
-                                <label className="form-label fw-semibold ms-3 mb-0">Mobile number</label>
+                                <label className="form-label fw-semibold ms-3 mb-1">Mobile number</label>
                                 <PhoneInput
                                     country={"in"}
                                     countryCodeEditable={false}
@@ -509,7 +540,7 @@ const Login = ({ handleClose, URL }) => {
                         <form className="my-4" onSubmit={handleSubmitOtp}>
                             <p className="fw-medium text-center">Otp send to your {channel} </p>
                             <div className="mb-3">
-                                <label className="form-label fw-semibold ms-3 mb-0">OTP</label>
+                                <label className="form-label fw-semibold ms-3 mb-1">OTP</label>
                                 <input
                                     type="text"
                                     className="form-control"
@@ -528,18 +559,22 @@ const Login = ({ handleClose, URL }) => {
                             <p className="text-danger text-center">{error}</p>
                         </form>}
                     <hr />
-                    {channel === 'WHATSAPP' ?
+                    {!isOtpSend && (
                         <button
-                            onClick={() => setChannel("SMS")}
-                            className={`${styles.signinOptionsBtn} mb-2 w-100 d-flex align-items-center justify-content-center`}>
-                            <RiMessage3Fill size={20} className="me-2" /> Sign in with Mobile
+                            onClick={() => setChannel(channel === "WHATSAPP" ? "SMS" : "WHATSAPP")}
+                            className={`${styles.signinOptionsBtn} mb-2 w-100 d-flex align-items-center justify-content-center`}
+                        >
+                            {channel === "WHATSAPP" ? (
+                                <>
+                                    <RiMessage3Fill size={20} className="me-2" /> Sign in with Mobile
+                                </>
+                            ) : (
+                                <>
+                                    <RiWhatsappFill size={20} className="me-2" /> Sign in with WhatsApp
+                                </>
+                            )}
                         </button>
-                        : <button
-                            onClick={() => setChannel("WHATSAPP")}
-                            className={`${styles.signinOptionsBtn} mb-2 w-100 d-flex align-items-center justify-content-center`}>
-                            <RiWhatsappFill size={20} className="me-2" /> Sign in with Whatsapp
-                        </button>
-                    }
+                    )}
                     <button
                         onClick={() => {
                             setIsOtpSignin(false)
@@ -558,7 +593,7 @@ const Login = ({ handleClose, URL }) => {
                     <>
                         <form className="mt-4 mb-2" onSubmit={handleEmailSignin}>
                             <div className="mb-2">
-                                <label className="form-label fw-semibold ms-3 mb-0">Email</label>
+                                <label className="form-label fw-semibold ms-3 mb-1">Email</label>
                                 <input
                                     type="email"
                                     className="form-control"
@@ -568,14 +603,22 @@ const Login = ({ handleClose, URL }) => {
                                 />
                             </div>
                             <div className="mb-1">
-                                <label className="form-label fw-semibold ms-3 mb-0">Password</label>
+                                <label className="form-label fw-semibold ms-3 mb-1">Password</label>
+                                <div className="position-relative">
                                 <input
-                                    type="password"
-                                    className="form-control"
+                                    type={showPassword ? "text" : "password"}
+                                    className="form-control pe-5"
                                     placeholder="Enter your password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                 />
+                                <span
+                                    className={styles.eyeIcon}
+                                    onClick={() => setShowPassword(!showPassword)}
+                                >
+                                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                                </span>
+                                </div>
                             </div>
                             <div className="mb-3 ms-2">
                                 <p
@@ -589,10 +632,8 @@ const Login = ({ handleClose, URL }) => {
                             </div>
                             <button type="submit"
                                 disabled={loading} className={styles.submitButton}>
-                                {!loading && (
-                                    <>Sign in</>
-                                )}
-                                {loading && <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>}
+                                {loading ? <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                                    : "Sign in"}
                             </button>
                             <p className="text-danger text-center mt-2">{error}</p>
                         </form>
@@ -631,7 +672,7 @@ const Login = ({ handleClose, URL }) => {
                         {!signupSecond ?
                             <>
                                 <div className="mb-2">
-                                    <label className="form-label fw-semibold ms-3 mb-0">Email</label>
+                                    <label className="form-label fw-semibold ms-3 mb-1">Email</label>
                                     <input
                                         type="email"
                                         className="form-control"
@@ -641,7 +682,7 @@ const Login = ({ handleClose, URL }) => {
                                     />
                                 </div>
                                 <div className="mb-2">
-                                    <label className="form-label fw-semibold ms-3 mb-0">Password</label>
+                                    <label className="form-label fw-semibold ms-3 mb-1">Password</label>
                                     <input
                                         type="password"
                                         className="form-control"
@@ -651,7 +692,7 @@ const Login = ({ handleClose, URL }) => {
                                     />
                                 </div>
                                 <div className="mb-3">
-                                    <label className="form-label fw-semibold ms-3 mb-0">Confirm Password</label>
+                                    <label className="form-label fw-semibold ms-3 mb-1">Confirm Password</label>
                                     <input
                                         type="password"
                                         className="form-control"
@@ -677,7 +718,7 @@ const Login = ({ handleClose, URL }) => {
                                     </div>
                                 }
                                 <div className="mb-2">
-                                    <label className="form-label fw-semibold ms-3 mb-0">Name</label>
+                                    <label className="form-label fw-semibold ms-3 mb-1">Name</label>
                                     <input
                                         type="text"
                                         className="form-control"
@@ -688,7 +729,7 @@ const Login = ({ handleClose, URL }) => {
                                 </div>
                                 {isEmailEntered ?
                                     <div className="mb-2">
-                                        <label className="form-label fw-semibold ms-3 mb-0">Mobile number</label>
+                                        <label className="form-label fw-semibold ms-3 mb-1">Mobile number</label>
                                         <PhoneInput
                                             country={"in"}
                                             countryCodeEditable={false}
@@ -697,7 +738,7 @@ const Login = ({ handleClose, URL }) => {
                                         />
                                     </div> :
                                     <div className="mb-2">
-                                        <label className="form-label fw-semibold ms-3 mb-0">Email</label>
+                                        <label className="form-label fw-semibold ms-3 mb-1">Email</label>
                                         <input
                                             type="email"
                                             className="form-control"
@@ -708,7 +749,7 @@ const Login = ({ handleClose, URL }) => {
                                     </div>
                                 }
                                 <div className="mb-3">
-                                    <label className="form-label fw-semibold ms-3 mb-0">State</label>
+                                    <label className="form-label fw-semibold ms-3 mb-1">State</label>
                                     <select
                                         onChange={(e) => {
                                             setState(e.target.value);
@@ -813,7 +854,7 @@ const Login = ({ handleClose, URL }) => {
                 {showForgetPass && !isEmailSend &&
                     <form className="my-4" onSubmit={handleForgetPassword}>
                         <div className="mb-3">
-                            <label className="form-label fw-semibold ms-3 mb-0">Email</label>
+                            <label className="form-label fw-semibold ms-3 mb-1">Email</label>
                             <input
                                 type="email"
                                 className="form-control"

@@ -51,19 +51,19 @@
   padding: 10px 15px;
   font-weight: 500;
   border: none;
-  background-color: #ebebeb;
+  background-color: #f4f4f4;
 }
 
 .modalContent input:focus,
 .modalContent select:focus {
   border:none;
-  background-color: #ebebeb;
+  background-color: #f4f4f4;
   box-shadow: none;
 }
 
 .modalContent input::placeholder {
   font-weight: 400;
-  color: #676767;
+  color: #848484;
 }
 
 .modalContent .submitButton {
@@ -114,6 +114,19 @@
 
 .backBtn:hover {
   color: var(--primary-color);
+}
+
+.eyeIcon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 18px;
+  color: #888;
+}
+.eyeIcon:hover {
+  color: #333;
 }
 
 /* .phoneInput {

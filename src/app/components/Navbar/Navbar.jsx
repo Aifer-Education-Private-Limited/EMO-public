@@ -64,6 +64,7 @@ export default function Navbar() {
               src="/emo-logo.png" alt="emo" />
           </Link>
 
+          {/* MOBILE VIEW */}
           <div className="d-md-none d-flex gap-1 ms-auto align-items-center">
             <a href="#pricing"><button
               className={`${styles.freeTrialBtn}`}
@@ -71,7 +72,7 @@ export default function Navbar() {
             {user ? (
               <div className={styles.userDropdown} ref={dropdownRef}>
                 <button className={styles.userBtn} onClick={toggleUserDropdown}>
-                  {userDetails.name} &nbsp;
+                  {userDetails.name?.split(" ")[0]} &nbsp;
                   {userDropdownOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
                 </button>
                 {userDropdownOpen && (
@@ -107,6 +108,7 @@ export default function Navbar() {
             </ul>
           </div>
 
+          {/* DESKTOP VIEW */}
           <div className="d-none d-md-flex">
             <a href="#pricing"><button
               className={`${styles.freeTrialBtn} me-1`}
@@ -115,7 +117,7 @@ export default function Navbar() {
           {user && userDetails ? (
             <div className={styles.userDropdown} ref={dropdownRef}>
               <button className={styles.userBtn} onClick={toggleUserDropdown}>
-                {userDetails.name} &nbsp;
+                {userDetails.name?.split(" ")[0]} &nbsp;
                 {userDropdownOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
               </button>
               {userDropdownOpen && (
