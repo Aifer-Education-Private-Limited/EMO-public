@@ -1,0 +1,123 @@
+.modalOverlay {
+  background: rgba(0, 0, 0, 0.7);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  z-index: 1050;
+  overflow-y: auto;
+  padding: 2rem 0;
+}
+
+.modalContent {
+  background: white;
+  padding: 2rem;
+  border-radius: 25px;
+  width: 100%;
+  max-width: 450px;
+  position: relative;
+  overflow: auto;
+}
+
+.closeBtn {
+  position: absolute;
+  top: -3px;
+  right: 15px;
+  border: none;
+  background: none;
+  font-size: 34px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.closeBtn:hover {
+  color: var(--primary-color);
+}
+
+.googleBtn {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+
+.modalContent input,
+.modalContent select {
+  width: 100%;
+  border-radius: 50px;
+  padding: 10px 15px;
+  font-weight: 500;
+  border: none;
+  background-color: #ebebeb;
+}
+
+.modalContent input:focus,
+.modalContent select:focus {
+  border:none;
+  background-color: #ebebeb;
+  box-shadow: none;
+}
+
+.modalContent input::placeholder {
+  font-weight: 400;
+  color: #676767;
+}
+
+.modalContent .submitButton {
+  background: linear-gradient(145deg, #0151b0, #00a1e4) !important;
+  width: 100%;
+  color: white;
+  padding: 0.6em 1.3em;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  transition: all 300ms;
+}
+
+
+.modalContent .submitButton:hover {
+  box-shadow: 3px 0 12px #0062ff60;
+}
+
+.modalContent .submitButton:disabled {
+  background: #bdbdbd !important;
+}
+
+.modalContent .submitButton:disabled:hover {
+  box-shadow: none;
+}
+
+.signinOptionsBtn {
+  background-color: transparent;
+  color: #232323;
+  padding: 8px;
+  border-radius: 50px;
+  border: 1.5px solid #232323;
+  cursor: pointer;
+  transition: all 300ms;
+}
+
+.signinOptionsBtn:hover {
+  background-color: #232323;
+  color: white;
+}
+
+.backBtn {
+  cursor: pointer;
+  color: #363636;
+  font-size: 17px;
+  font-weight: 400;
+}
+
+.backBtn:hover {
+  color: var(--primary-color);
+}
+
+/* .phoneInput {
+  border-radius: 50px !important;
+  padding: 10px 15px !important;
+  font-weight: 500 !important;
+} */

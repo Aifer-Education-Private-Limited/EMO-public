@@ -68,6 +68,55 @@
   color: white;
 }
 
+.userBtn {
+  font-weight: 500;
+  border: 2px solid var(--primary-color);
+  color: var(--primary-color);
+  background: white;
+  border-radius: 50px;
+  cursor: pointer;
+  padding: 0.55rem 1.5rem;
+  transition: all 0.3s;
+}
+
+.userDropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border-radius: 15px;
+  width: 150px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  padding: 5px 0;
+}
+
+.dropdownMenu li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dropdownMenu li:hover {
+  background-color: #f0f0f0;
+}
+
+.dropdownMenu li a{
+  text-decoration: none;
+  color: black;
+  font-weight: 500;
+}
+
+.logoutBtn{
+  border: none;
+  background: transparent;
+  font-weight: 500;
+}
+
 @media screen and (max-width: 768px) {
   .freeTrialBtn {
     padding: 0.45rem 1rem;
@@ -83,7 +132,12 @@
   }
 }
 
-@media screen and (max-width: 425px) {
+@media screen and (max-width: 576px) {
+  .logo {
+    height: 35px;
+    width: auto;
+  }
+
   .freeTrialBtn {
     padding: 0.35rem 0.8rem;
   }

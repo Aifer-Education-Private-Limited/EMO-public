@@ -6,12 +6,14 @@ const Footer = () => {
     <footer className={styles.footer}>
       <div className="container">
         <div className="row">
-          <div className="col-lg-4 mb-4">
-            <img src="/" alt="Emo" className={styles.logo} />
+          <div className="col-lg-3 col-md-6 mb-4">
+            <img src="/emo-logo.png" alt="Emo" className={styles.logo} />
             <p className={styles.description}>
               AI-powered exam preparation platform helping students achieve their dreams
             </p>
           </div>
+
+          <div className="col-lg-2 col-md-6"></div>
 
           <div className="col-lg-2 col-md-4 mb-4">
             <h4 className={styles.title}>Product</h4>
