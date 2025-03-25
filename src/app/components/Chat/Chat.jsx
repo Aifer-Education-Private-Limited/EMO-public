@@ -207,11 +207,11 @@ const App = () => {
         <div className={`col-md-3 col-lg-3 col-xl-2 px-0 ${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : ''}`}>
           <div className="p-3">
             <div className="d-flex justify-content-between">
-              {/* <Link href="/" className="navbar-brand align-items-center mb-4">
-                        <img
-                            className={styles.logo}
-                            src="/emo-logo.png" alt="emo" />
-                    </Link> */}
+              <Link href="/" className="navbar-brand align-items-center mb-4 d-none d-md-flex">
+                <img
+                  className={styles.logo}
+                  src="/emo-logo.png" alt="emo" />
+              </Link>
               <img src='/circleavatar.png' alt='avatar' className={`${styles.avatar} d-md-none`} />
               <button
                 onClick={toggleSidebar}

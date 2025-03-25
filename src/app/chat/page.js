@@ -4,14 +4,14 @@ import Chat from '../components/Chat/Chat'
 import ProtectedRoute from '../components/ProtectedRoute'
 import { usePathname } from 'next/navigation'
 
-const page = () => {
+const Page = () => {
     const route = usePathname()
 
     return (
         // <ProtectedRoute route={route}>
             <Chat />
-        // </ProtectedRoute>
+        //  </ProtectedRoute>
     )
 }
 
-export default page;
+export default Page;
