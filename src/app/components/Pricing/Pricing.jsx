@@ -6,10 +6,12 @@ import { useEffect, useState } from "react";
 import { fetchUserById } from "@/app/constants/features/user";
 import Login from "../Login/Login";
 import { useDispatch } from "react-redux";
+import { useRouter } from "next/navigation";
 
 const Pricing = () => {
   const [user, setUser] = useState(false)
   const [login, setLogin] = useState(false)
+  const router = useRouter()
 
   const dispatch = useDispatch()
 
@@ -25,7 +27,7 @@ const Pricing = () => {
     if (!user) {
       setLogin(true)
     } else {
-      console.log("get started")
+      router
     }
   }
 
