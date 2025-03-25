@@ -85,12 +85,12 @@ export default function Navbar() {
               <button className={styles.loginBtn} onClick={toggleShowLogin}>Log in</button>
             )}
             <button
-              className={`${styles.togglerIcon} ms-2`}
+              className={`${styles.togglerIcon}`}
               type="button"
               data-bs-toggle="collapse"
               data-bs-target="#navbarNav"
             >
-              <HiMenu size={30} />
+              <HiMenu />
             </button>
           </div>
 
@@ -113,26 +113,26 @@ export default function Navbar() {
             <a href="#pricing"><button
               className={`${styles.freeTrialBtn} me-1`}
             >Start Free Trial</button></a>
-          </div>
-          {user && userDetails ? (
-            <div className={styles.userDropdown} ref={dropdownRef}>
-              <button className={styles.userBtn} onClick={toggleUserDropdown}>
-                {userDetails.name?.split(" ")[0]} &nbsp;
-                {userDropdownOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
+            {user && userDetails ? (
+              <div className={styles.userDropdown} ref={dropdownRef}>
+                <button className={styles.userBtn} onClick={toggleUserDropdown}>
+                  {userDetails.name?.split(" ")[0]} &nbsp;
+                  {userDropdownOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
+                </button>
+                {userDropdownOpen && (
+                  <ul className={styles.dropdownMenu}>
+                    <li onClick={userLogout}>
+                      <button className={styles.logoutBtn}>Logout</button>
+                    </li>
+                  </ul>
+                )}
+              </div>
+            ) : (
+              <button className={`${styles.loginBtn} d-none d-md-inline`} onClick={toggleShowLogin}>
+                Log in
               </button>
-              {userDropdownOpen && (
-                <ul className={styles.dropdownMenu}>
-                  <li onClick={userLogout}>
-                    <button className={styles.logoutBtn}>Logout</button>
-                  </li>
-                </ul>
-              )}
-            </div>
-          ) : (
-            <button className={`${styles.loginBtn} d-none d-md-inline`} onClick={toggleShowLogin}>
-              Log in
-            </button>
-          )}
+            )}
+          </div>
 
         </div>
       </nav>
