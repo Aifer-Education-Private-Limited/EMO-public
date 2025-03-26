@@ -165,6 +165,32 @@ const App = () => {
         "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
       timestamp: "10:02 AM",
     },
+    {
+      id: 6,
+      type: "user",
+      content: "Yes, please explain the main steps.",
+      timestamp: "10:02 AM",
+    },
+    {
+      id: 7,
+      type: "ai",
+      content:
+        "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
+      timestamp: "10:02 AM",
+    },
+    {
+      id: 8,
+      type: "user",
+      content: "Yes, please explain the main steps.",
+      timestamp: "10:02 AM",
+    },
+    {
+      id: 9,
+      type: "ai",
+      content:
+        "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
+      timestamp: "10:02 AM",
+    },
   ]);
 
 
