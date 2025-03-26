@@ -97,13 +97,37 @@ export default function Navbar() {
           <div className="collapse navbar-collapse justify-content-center text-end" id="navbarNav">
             <ul className="navbar-nav py-md-0 py-3 me-md-0 me-3 gap-3">
               <li className="nav-item">
-                <Link href="#features" className={styles.navLink}>Features</Link>
+                <a
+                  href="#features"
+                  className={styles.navLink}
+                  data-bs-toggle="collapse"
+                  data-bs-target="#navbarNav"
+                  onClick={() => {
+                    window.location.hash = "#features";
+                  }}
+                >Features</a>
               </li>
               <li className="nav-item">
-                <Link href="#pricing" className={styles.navLink}>Pricing</Link>
+                <a
+                  href="#pricing"
+                  className={styles.navLink}
+                  data-bs-toggle="collapse"
+                  data-bs-target="#navbarNav"
+                  onClick={() => {
+                    window.location.hash = "#pricing";
+                  }}
+                >Pricing</a>
               </li>
               <li className="nav-item">
-                <Link href="#about" className={styles.navLink}>About</Link>
+                <a
+                  href="#about"
+                  className={styles.navLink}
+                  data-bs-toggle="collapse"
+                  data-bs-target="#navbarNav"
+                  onClick={() => {
+                    window.location.hash = "#about";
+                  }}
+                >About</a>
               </li>
             </ul>
           </div>

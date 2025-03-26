@@ -12,11 +12,60 @@
   margin-bottom: 30px;
 }
 
+/* Chat window */
+.mobileHeader {
+  position: sticky;
+  top: 0;
+  background: white;
+  z-index: 100;
+}
+
 .chatWindow {
   height: 100vh;
   display: flex;
   flex-direction: column;
 }
+
+.logo {
+  height: 40px;
+  width: auto;
+}
+
+.tabs {
+  border-bottom: none;
+  background-color: rgb(248, 249, 250);
+  padding: 10px 20px 0;
+}
+
+.tabButtons {
+  width: 80%;
+}
+
+.active {
+  width: 48%;
+  border: none;
+  background-color: var(--primary-color) !important;
+  padding: 10px;
+  color: white !important;
+  border-radius: 10px 10px 10px 10px !important;
+  transition: all 0.3s;
+}
+
+.inActive {
+  width: 48%;
+  border: 1px solid var(--primary-color) !important;
+  padding: 10px;
+  color: var(--primary-color) !important;
+  border-radius: 10px 10px 10px 10px !important;
+  transition: all 0.3s;
+}
+
+.inActive:hover {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+  border: none;
+}
+/* Chat window */
 
 .messages {
   flex-grow: 1;
@@ -80,15 +129,7 @@
   color: #848484;
 }
 
-.tabs {
-  border-bottom: none;
-  background-color: rgb(248, 249, 250);
-  padding: 10px 20px 0;
-}
 
-.tabButtons {
-  width: 80%;
-}
 
 .avatar {
   width: 40px;
@@ -97,31 +138,6 @@
   object-fit: cover;
   cursor: pointer;
   border: 1px solid #b7b7b7;
-}
-
-.active {
-  width: 48%;
-  border: none;
-  background-color: var(--primary-color) !important;
-  padding: 10px;
-  color: white !important;
-  border-radius: 10px 10px 10px 10px !important;
-  transition: all 0.3s;
-}
-
-.inActive {
-  width: 48%;
-  border: 1px solid var(--primary-color) !important;
-  padding: 10px;
-  color: var(--primary-color) !important;
-  border-radius: 10px 10px 10px 10px !important;
-  transition: all 0.3s;
-}
-
-.inActive:hover {
-  background-color: var(--primary-color) !important;
-  color: white !important;
-  border: none;
 }
 
 .popularQuestions {
@@ -144,10 +160,7 @@
   padding: 10px 0;
 }
 
-.logo {
-  height: 40px;
-  width: auto;
-}
+
 
 .chatHistoryItem {
   padding: 10px 20px;
@@ -162,7 +175,7 @@
 
 .message {
   display: flex;
-  margin: 20px 0;
+  margin: 25px 0;
 }
 
 .userMessage {
@@ -214,6 +227,7 @@
 }
 
 @media (max-width: 768px) {
+
   .message{
     margin: 8px 0;
   }

@@ -121,7 +121,7 @@
 
 
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FiMenu, FiSend } from 'react-icons/fi';
 import styles from './Chat.module.css';
 import Link from 'next/link';
@@ -132,65 +132,171 @@ const App = () => {
   const [activeTab, setActiveTab] = useState('search');
   const [searchQuery, setSearchQuery] = useState('');
 
+  const chatBodyRef = useRef(null)
+
   const [messages, setMessages] = useState([
-    {
-      id: 1,
-      type: "ai",
-      content: "Hello! How can I help you with your studies today?",
-      timestamp: "10:00 AM",
-    },
-    {
-      id: 2,
-      type: "user",
-      content: "I need help understanding photosynthesis.",
-      timestamp: "10:01 AM",
-    },
-    {
-      id: 3,
-      type: "ai",
-      content:
-        "Photosynthesis is the process by which plants convert light energy into chemical energy. Would you like me to explain the key steps involved?",
-      timestamp: "10:01 AM",
-    },
-    {
-      id: 4,
-      type: "user",
-      content: "Yes, please explain the main steps.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 5,
-      type: "ai",
-      content:
-        "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 6,
-      type: "user",
-      content: "Yes, please explain the main steps.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 7,
-      type: "ai",
-      content:
-        "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 8,
-      type: "user",
-      content: "Yes, please explain the main steps.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 9,
-      type: "ai",
-      content:
-        "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-      timestamp: "10:02 AM",
-    },
+    // {
+    //   id: 1,
+    //   type: "ai",
+    //   content: "https://txp3t1rs-3000.inc1.devtunnels.ms/",
+    //   timestamp: "10:00 AM",
+    // },
+    // {
+    //   id: 2,
+    //   type: "user",
+    //   content: "I need help understanding photosynthesis.",
+    //   timestamp: "10:01 AM",
+    // },
+    // {
+    //   id: 3,
+    //   type: "ai",
+    //   content:
+    //     "Photosynthesis is the process by which plants convert light energy into chemical energy. Would you like me to explain the key steps involved?",
+    //   timestamp: "10:01 AM",
+    // },
+    // {
+    //   id: 4,
+    //   type: "user",
+    //   content: "Yes, please explain the main steps.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 5,
+    //   type: "ai",
+    //   content:
+    //     "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 6,
+    //   type: "user",
+    //   content: "Yes, please explain the main steps.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 7,
+    //   type: "ai",
+    //   content:
+    //     "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 8,
+    //   type: "user",
+    //   content: "Yes, please explain the main steps.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 9,
+    //   type: "ai",
+    //   content:
+    //     "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 10,
+    //   type: "user",
+    //   content: "Yes, please explain the main steps.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 11,
+    //   type: "ai",
+    //   content:
+    //     "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 12,
+    //   type: "user",
+    //   content: "Yes, please explain the main steps.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 13,
+    //   type: "ai",
+    //   content:
+    //     "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 14,
+    //   type: "user",
+    //   content: "Yes, please explain the main steps.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 15,
+    //   type: "ai",
+    //   content:
+    //     "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 16,
+    //   type: "user",
+    //   content: "Yes, please explain the main steps.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 17,
+    //   type: "ai",
+    //   content:
+    //     "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 18,
+    //   type: "user",
+    //   content: "Yes, please explain the main steps.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 19,
+    //   type: "ai",
+    //   content:
+    //     "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 20,
+    //   type: "user",
+    //   content: "Yes, please explain the main steps.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 21,
+    //   type: "ai",
+    //   content:
+    //     "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 22,
+    //   type: "user",
+    //   content: "Yes, please explain the main steps.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 23,
+    //   type: "ai",
+    //   content:
+    //     "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 24,
+    //   type: "user",
+    //   content: "Yes, please explain the main steps.",
+    //   timestamp: "10:02 AM",
+    // },
+    // {
+    //   id: 25,
+    //   type: "ai",
+    //   content:
+    //     "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
+    //   timestamp: "10:02 AM",
+    // },
   ]);
 
 
@@ -225,6 +331,13 @@ const App = () => {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+  useEffect(() => {
+    // to scroll to bottom
+    if (chatBodyRef.current) {
+      chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
+    }
+  }, [messages]);
 
   return (
     <div className="container-fluid">
@@ -264,7 +377,8 @@ const App = () => {
         <div className="col-md-9 col-lg-9 col-xl-10 px-0">
           <div className={styles.chatWindow}>
             {/* Mobile Header */}
-            <div className="d-md-none px-3 py-0 mb-0 border-bottom d-flex justify-content-between mt-2">
+            <div
+             className={`${styles.mobileHeader} d-md-none px-3 py-0 mb-0 border-bottom d-flex justify-content-between mt-2`}>
               <Link href="/" className="navbar-brand align-items-center">
                 <img
                   className={styles.logo}
@@ -300,7 +414,7 @@ const App = () => {
 
 
             {/* Messages Area */}
-            <div className={`${styles.messages}`}>
+            <div className={`${styles.messages}`} ref={chatBodyRef}>
               {activeTab === 'search' ? (
                 <div>
                   {messages.length > 0 ?
@@ -360,6 +474,7 @@ const App = () => {
                 <button
                   // onClick={sendMessage}
                   disabled={!searchQuery}
+                    onClick={handleSend}
                   className={`${styles.searchButton}`}>
                   <FiSend size={23} />
                 </button>
