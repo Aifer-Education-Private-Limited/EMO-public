@@ -8,11 +8,11 @@ const ChatSidebar = ({ isSidebarOpen, recentChats, toggleSidebar }) => {
         <div className={`col-md-3 col-lg-3 col-xl-2 px-0 ${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : ''}`}>
             <div className="p-3">
                 <div className="d-flex justify-content-between">
-                    {/* <Link href="/" className="navbar-brand align-items-center mb-4">
+                    <Link href="/" className="navbar-brand align-items-center mb-4 d-none d-md-flex">
                         <img
                             className={styles.logo}
                             src="/emo-logo.png" alt="emo" />
-                    </Link> */}
+                    </Link>
                     <img src='/circleavatar.png' alt='avatar' className={`${styles.avatar} d-md-none`} />
                     <button
                         onClick={toggleSidebar}
@@ -21,7 +21,6 @@ const ChatSidebar = ({ isSidebarOpen, recentChats, toggleSidebar }) => {
                     </button>
                 </div>
                 <button
-                    //  onClick={addNewChat} 
                     className="primary-btn w-100 mb-4">+ New Chat</button>
                 <h6 className="text-muted mb-0">Recent Chats</h6>
                 <div className={styles.chatHistory}>

@@ -14,8 +14,9 @@ const ChatInput = ({ searchQuery, setSearchQuery, sendMessage }) => {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         <button
-          onClick={sendMessage}
+          // onClick={sendMessage}
           disabled={!searchQuery}
+          onClick={sendMessage}
           className={`${styles.searchButton}`}>
           <FiSend size={23} />
         </button>

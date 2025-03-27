@@ -69,15 +69,23 @@ export default function Navbar() {
             <a href="#pricing"><button
               className={`${styles.freeTrialBtn}`}
             >Start Free Trial</button></a>
-            {user ? (
-              <div className={styles.userDropdown} ref={dropdownRef}>
-                <button className={styles.userBtn} onClick={toggleUserDropdown}>
+            {user && userDetails ? (
+              <div className={styles.userDropdown} 
+              ref={dropdownRef}
+              >
+                <button className={styles.userBtn} 
+                onClick={toggleUserDropdown}
+                >
                   {userDetails.name?.split(" ")[0]} &nbsp;
                   {userDropdownOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
                 </button>
                 {userDropdownOpen && (
                   <ul className={styles.dropdownMenu}>
-                    <li><button className={styles.logoutBtn}>Logout</button></li>
+                    <li onClick={userLogout}>
+                      <button className={styles.logoutBtn}>
+                        Logout
+                      </button>
+                    </li>
                   </ul>
                 )}
               </div>
@@ -128,6 +136,15 @@ export default function Navbar() {
                     window.location.hash = "#about";
                   }}
                 >About</a>
+              </li>
+              <li className="nav-item">
+                <a
+                  href="#about"
+                  className={styles.navLink}
+                  data-bs-toggle="collapse"
+                  data-bs-target="#navbarNav"
+                  onClick={() => router.push("/chat")}
+                >Chat</a>
               </li>
             </ul>
           </div>

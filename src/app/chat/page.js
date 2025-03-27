@@ -8,9 +8,9 @@ const Page = () => {
     const route = usePathname()
 
     return (
-        // <ProtectedRoute route={route}>
+        <ProtectedRoute route={route}>
             <Chat />
-        //  </ProtectedRoute>
+        </ProtectedRoute>
     )
 }
 

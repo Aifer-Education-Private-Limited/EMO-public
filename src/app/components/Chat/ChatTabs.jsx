@@ -7,7 +7,7 @@ const ChatTabs = ({ activeTab, setActiveTab }) => {
     <div className={`${styles.tabs} py-2 bg-light`}>
       <div className="d-flex justify-content-between">
         <div
-        className={styles.tabButtons}
+          className={styles.tabButtons}
         >
           <button
             className={`${activeTab === 'search' ? styles.active : styles.inActive}`}

@@ -7,6 +7,7 @@ import { fetchUserById } from "@/app/constants/features/user";
 import Login from "../Login/Login";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const Pricing = () => {
   const [user, setUser] = useState(false)
@@ -27,7 +28,7 @@ const Pricing = () => {
     if (!user) {
       setLogin(true)
     } else {
-      router
+      router.push("/chat")
     }
   }
 
@@ -108,7 +109,7 @@ const Pricing = () => {
       </section>
 
       {login && <Login
-        URL="#pricing"
+        URL="/chat"
         handleClose={() => setLogin(!login)}
       />}
     </>

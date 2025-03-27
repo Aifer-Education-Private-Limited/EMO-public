@@ -13,11 +13,16 @@
 }
 
 /* Chat window */
+.headers{
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
 .mobileHeader {
   position: sticky;
   top: 0;
   background: white;
-  z-index: 100;
 }
 
 .chatWindow {

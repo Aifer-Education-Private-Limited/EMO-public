@@ -23,7 +23,6 @@ const ProtectedRoute = ({ children, route }) => {
 
     useEffect(() => {
         if (!loading && !user?.id) {
-            // router.push("/");
             setShowLogin(true)
         }
     }, [user, loading, router]);
@@ -39,7 +38,14 @@ const ProtectedRoute = ({ children, route }) => {
     return (
         <>
             {user?.id ? children : null}
-            {showLogin && <Login URL={route} handleClose={() => setShowLogin(false)} />}
+            {showLogin &&
+                <Login
+                    URL={route}
+                    handleClose={() => {
+                        setShowLogin(false)
+                        router.push("/")
+                    }}
+                />}
         </>
     );
 };
