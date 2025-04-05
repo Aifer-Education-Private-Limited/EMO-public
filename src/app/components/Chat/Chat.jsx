@@ -189,7 +189,7 @@ const Chat = () => {
     const question = { content: query, role: "user" };
     setMessages([question])
     try {
-      const { data } = await axios.post("https://vector.mymeet.link/api/v1/vector/aifer/searc", { query })
+      const { data } = await axios.post("https://vector.mymeet.link/api/v1/vector/aifer/search", { query })
 
       if (!data.most_similar_text || data.most_similar_text.length === 0) {
         setResponseError("No results found");
