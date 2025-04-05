@@ -17,6 +17,8 @@ const Chat = () => {
   const [responseLoading, setResponseLoading] = useState(false)
   const [responseError, setResponseError] = useState("")
   const selectedSearchResponseId = useRef(0);
+  const [showPopularQuestions, setShowPopularQuestions] = useState(false)
+  const [lastQuery, setLastQuery] = useState("")
   const [sessionHistory, setSessionHistory] = useState([
     {
       id: 1,
@@ -41,6 +43,7 @@ const Chat = () => {
   const onSubmitNewMessage = async () => {
     if (searchQuery === "") return
     setResponseLoading(true)
+    setShowPopularQuestions(true)
 
     if (currentMode === "search") {
       setSearchQuery("");
@@ -53,6 +56,8 @@ const Chat = () => {
       )
     } else if (selectedSessionId === null && currentMode === "pyq") {
       setSearchQuery("");
+      const question = { content: searchQuery, role: "user" };
+      setMessages((prev) => [...prev, question]);
       fetchPyqData(searchQuery)
     } else {
       console.log("else");
@@ -185,9 +190,8 @@ const Chat = () => {
 
 
   const fetchPyqData = async (query) => {
+    setLastQuery(query)
     setResponseError("")
-    const question = { content: query, role: "user" };
-    setMessages([question])
     try {
       const { data } = await axios.post("https://vector.mymeet.link/api/v1/vector/aifer/search", { query })
 
@@ -245,19 +249,26 @@ const Chat = () => {
   }
 
   const handleRegenerate = async () => {
-    if (messages.length < 2) return; // Ensure there's a previous user query
-    const prevChat = messages.slice(0, -1); // Remove last AI response
-    const lastUserQuery = prevChat.pop();
+    if (currentMode === "pyq") {
+      if (lastQuery) {
+        fetchPyqData(lastQuery);
+      }
+    } else {
+      if (messages.length < 2) return; // Ensure there's a previous user query
+      const prevChat = messages.slice(0, -1); // Remove last AI response
+      const lastUserQuery = prevChat.pop();
 
-    if (lastUserQuery.role !== "user") return; // Ensure last message was from user
+      if (lastUserQuery.role !== "user") return; // Ensure last message was from user
 
-    setResponseLoading(true);
-    await fetchData(lastUserQuery.content, selectedSearchResponseId?.current ?? 0, currentMode, prevChat);
-    setResponseLoading(false);
+      setResponseLoading(true);
+      await fetchData(lastUserQuery.content, selectedSearchResponseId?.current ?? 0, currentMode, prevChat);
+      setResponseLoading(false);
+    }
   };
 
 
   const handleSelectQuestion = (question) => {
+    setShowPopularQuestions(false)
     const selectedQuestion = { content: question, role: "assistant-remote" };
     setMessages((prev) => [...prev, selectedQuestion]);
     setPopularQuestions([])
@@ -269,6 +280,7 @@ const Chat = () => {
 
   useEffect(() => {
     setMessages([])
+    setShowPopularQuestions(false)
   }, [currentMode])
 
   return (
@@ -289,7 +301,7 @@ const Chat = () => {
             <div className={styles.headers}>
               {/* Mobile Header */}
               <div
-                className={`${styles.mobileHeader} d-md-none px-3 py-0 mb-0 border-bottom d-flex justify-content-between mt-2`}>
+                className={`${styles.mobileHeader} d-md-none px-3 py-0 mb-0 d-flex justify-content-between mt-2`}>
                 <Link href="/" className="navbar-brand align-items-center">
                   <img
                     className={styles.logo}
@@ -318,6 +330,7 @@ const Chat = () => {
               onselectQuestion={handleSelectQuestion}
               responseError={responseError}
               formattedPyqData={formattedPyqData}
+              showPopularQuestions={showPopularQuestions}
             />
 
             {/* Input Area */}
@@ -327,6 +340,7 @@ const Chat = () => {
               currentMode={currentMode}
               sendMessage={handleSend}
               responseLoading={responseLoading}
+              showPyq={showPopularQuestions}
             />
 
           </div>

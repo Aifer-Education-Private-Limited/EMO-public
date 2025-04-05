@@ -9,7 +9,7 @@
   border: none;
   padding: 0;
   background: transparent;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 /* Chat window */
@@ -34,6 +34,7 @@
 .logo {
   height: 40px;
   width: auto;
+  margin: 3px auto;
 }
 
 .tabs {
@@ -301,7 +302,11 @@
 @media (max-width: 768px) {
 
   .message {
-    margin: 8px 0;
+    margin: 10px 0;
+  }
+
+  .aiMessage {
+    margin-bottom: 20px;
   }
 
   .messageContent {
@@ -339,10 +344,17 @@
     position: fixed;
     left: -100%;
     z-index: 1000;
-    width: 100% !important;
+    width: 50% !important;
+    box-shadow: 3px 0 6px rgba(0, 0, 0, 0.1);
   }
 
   .sidebarOpen {
     left: 0;
+  }
+}
+
+@media (max-width: 576px) {
+  .sidebar {
+    width: 90% !important;
   }
 }

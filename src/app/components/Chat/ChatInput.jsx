@@ -2,7 +2,7 @@ import React from 'react';
 import { FiSend } from 'react-icons/fi';
 import styles from './Chat.module.css';
 
-const ChatInput = ({ searchQuery, setSearchQuery, sendMessage, responseLoading }) => {
+const ChatInput = ({ searchQuery, setSearchQuery, sendMessage, responseLoading, showPyq }) => {
   return (
     <form
     onSubmit={sendMessage}
@@ -16,7 +16,7 @@ const ChatInput = ({ searchQuery, setSearchQuery, sendMessage, responseLoading }
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         <button
-          disabled={!searchQuery}
+          disabled={!searchQuery || responseLoading || showPyq}
           type='submit'
           className={`${styles.searchButton}`}
           >

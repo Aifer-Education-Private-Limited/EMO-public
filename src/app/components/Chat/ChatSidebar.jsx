@@ -15,7 +15,7 @@ const ChatSidebar = ({ isSidebarOpen, history, toggleSidebar, onNewChat }) => {
     return (
         <div className={`col-md-3 col-lg-3 col-xl-2 px-0 ${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : ''}`}>
             <div className="p-3">
-                <div className="d-flex justify-content-between">
+                <div className="d-flex justify-content-between mb-3">
                     <Link href="/" className="navbar-brand align-items-center mb-4 d-none d-md-flex">
                         <img
                             className={styles.logo}
