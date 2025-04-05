@@ -2,9 +2,11 @@ import React from 'react';
 import { FiSend } from 'react-icons/fi';
 import styles from './Chat.module.css';
 
-const ChatInput = ({ searchQuery, setSearchQuery, sendMessage }) => {
+const ChatInput = ({ searchQuery, setSearchQuery, sendMessage, responseLoading }) => {
   return (
-    <div className={styles.inputContainer}>
+    <form
+    onSubmit={sendMessage}
+     className={styles.inputContainer}>
       <div className={`d-flex gap-1 ${styles.searchInput}`}>
         <input
           type="text"
@@ -14,14 +16,14 @@ const ChatInput = ({ searchQuery, setSearchQuery, sendMessage }) => {
           onChange={(e) => setSearchQuery(e.target.value)}
         />
         <button
-          // onClick={sendMessage}
           disabled={!searchQuery}
-          onClick={sendMessage}
-          className={`${styles.searchButton}`}>
+          type='submit'
+          className={`${styles.searchButton}`}
+          >
           <FiSend size={23} />
         </button>
       </div>
-    </div>
+    </form>
   );
 };
 

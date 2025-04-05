@@ -13,10 +13,10 @@
 }
 
 /* Chat window */
-.headers{
+.headers {
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 10;
 }
 
 .mobileHeader {
@@ -70,6 +70,7 @@
   color: white !important;
   border: none;
 }
+
 /* Chat window */
 
 .messages {
@@ -130,7 +131,7 @@
   background-color: #f4f4f4;
 }
 
-.searchButton:disabled{
+.searchButton:disabled {
   color: #848484;
 }
 
@@ -165,8 +166,6 @@
   padding: 10px 0;
 }
 
-
-
 .chatHistoryItem {
   padding: 10px 20px;
   cursor: pointer;
@@ -174,8 +173,43 @@
   font-weight: 500;
 }
 
+.chatHistoryItem .right .optionsBtn{
+  display: none;
+  border: none;
+  background-color: transparent;
+}
+
 .chatHistoryItem:hover {
   background: #e9ecef;
+}
+
+.chatHistoryItem:hover.chatHistoryItem .right .optionsBtn{
+  display: block;
+}
+
+.optionsMenu {
+  position: absolute;
+  right: 0;
+  top: 30px;
+  background: white;
+  border-radius: 6px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  width: 120px;
+  z-index: 10;
+}
+
+.optionsMenu button {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 8px;
+  cursor: pointer;
+}
+
+.optionsMenu button:hover {
+  background: #f0f0f0;
 }
 
 .message {
@@ -189,6 +223,8 @@
 
 .aiMessage {
   justify-content: flex-start;
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 .messageContent {
@@ -211,6 +247,29 @@
   border-top-left-radius: 0;
 }
 
+.responseOptions {
+  display: flex;
+  gap: 5;
+}
+
+.responseOptions button {
+  align-self: flex-start;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-top: 8px;
+  margin-left: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: gray;
+  transition: color 0.2s ease-in-out;
+}
+
+.responseOptions button:hover {
+  color: black;
+}
+
 /* .timestamp {
   font-size: 0.75rem;
   color: #6c757d;
@@ -231,17 +290,25 @@
   margin-bottom: 0.2rem;
 }
 
+.errorResponse {
+  background-color: rgba(255, 0, 0, 0.026);
+  color: red;
+  padding: 20px 15px;
+  border-radius: 10px;
+  border: red 1px solid;
+}
+
 @media (max-width: 768px) {
 
-  .message{
+  .message {
     margin: 8px 0;
   }
 
-  .messageContent{
+  .messageContent {
     font-size: 14px;
   }
 
-  .tabButtons{
+  .tabButtons {
     display: flex;
     justify-content: center;
     width: 100%;

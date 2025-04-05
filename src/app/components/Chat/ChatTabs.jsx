@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styles from './Chat.module.css'
-import { IoSettingsOutline } from 'react-icons/io5';
 
-const ChatTabs = ({ activeTab, setActiveTab }) => {
+const ChatTabs = ({ currentMode, setCurrentMode }) => {
   return (
     <div className={`${styles.tabs} py-2 bg-light`}>
       <div className="d-flex justify-content-between">
@@ -10,12 +9,12 @@ const ChatTabs = ({ activeTab, setActiveTab }) => {
           className={styles.tabButtons}
         >
           <button
-            className={`${activeTab === 'search' ? styles.active : styles.inActive}`}
-            onClick={() => setActiveTab('search')}
+            className={`${currentMode === 'search' ? styles.active : styles.inActive}`}
+            onClick={() => setCurrentMode('search')}
           >Search</button>
           <button
-            className={`ms-2 ${activeTab === 'pyq' ? styles.active : styles.inActive}`}
-            onClick={() => setActiveTab('pyq')}
+            className={`ms-2 ${currentMode === 'pyq' ? styles.active : styles.inActive}`}
+            onClick={() => setCurrentMode('pyq')}
           >PYQ</button>
         </div>
 

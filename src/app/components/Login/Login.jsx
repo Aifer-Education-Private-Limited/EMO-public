@@ -111,6 +111,7 @@ const Login = ({ handleClose, URL }) => {
                     } else {
                         localStorage.setItem("studentToken", res.data.studentToken);
                         localStorage.setItem("Name", res.data.user[0].name);
+                        localStorage.setItem("email", res.data.user[0].email);
 
                         dispatch(fetchUserById());
                         handleClose();

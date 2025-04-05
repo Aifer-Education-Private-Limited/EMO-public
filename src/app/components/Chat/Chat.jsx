@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { use, useEffect, useRef, useState } from 'react';
 import { FiMenu } from 'react-icons/fi';
 import styles from './Chat.module.css';
 import ChatSidebar from './ChatSidebar';
@@ -6,215 +6,281 @@ import ChatTabs from './ChatTabs';
 import ChatMessages from './ChatMessages';
 import ChatInput from './ChatInput';
 import Link from 'next/link';
+import { fetchEventSource } from '@microsoft/fetch-event-source';
+import axios from 'axios';
 
 const Chat = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState('search');
+  const [currentMode, setCurrentMode] = useState('search');
   const [searchQuery, setSearchQuery] = useState('');
-
-  const [messages, setMessages] = useState([
+  const [selectedSessionId, setSelectedSessionId] = useState(null);
+  const [responseLoading, setResponseLoading] = useState(false)
+  const [responseError, setResponseError] = useState("")
+  const selectedSearchResponseId = useRef(0);
+  const [sessionHistory, setSessionHistory] = useState([
     {
       id: 1,
-      type: "ai",
-      content: "https://txp3t1rs-3000.inc1.devtunnels.ms/",
-      timestamp: "10:00 AM",
-    },
-    {
-      id: 2,
-      type: "user",
-      content: "I need help understanding photosynthesis.",
-      timestamp: "10:01 AM",
-    },
-    {
-      id: 3,
-      type: "ai",
-      content:
-        "Photosynthesis is the process by which plants convert light energy into chemical energy. Would you like me to explain the key steps involved?",
-      timestamp: "10:01 AM",
-    },
-    {
-      id: 4,
-      type: "user",
-      content: "Yes, please explain the main steps.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 5,
-      type: "ai",
-      content:
-        "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 6,
-      type: "user",
-      content: "Yes, please explain the main steps.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 7,
-      type: "ai",
-      content:
-        "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 8,
-      type: "user",
-      content: "Yes, please explain the main steps.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 9,
-      type: "ai",
-      content:
-        "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 10,
-      type: "user",
-      content: "Yes, please explain the main steps.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 11,
-      type: "ai",
-      content:
-        "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 12,
-      type: "user",
-      content: "Yes, please explain the main steps.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 13,
-      type: "ai",
-      content:
-        "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 14,
-      type: "user",
-      content: "Yes, please explain the main steps.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 15,
-      type: "ai",
-      content:
-        "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 16,
-      type: "user",
-      content: "Yes, please explain the main steps.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 17,
-      type: "ai",
-      content:
-        "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 18,
-      type: "user",
-      content: "Yes, please explain the main steps.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 19,
-      type: "ai",
-      content:
-        "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 20,
-      type: "user",
-      content: "Yes, please explain the main steps.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 21,
-      type: "ai",
-      content:
-        "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 22,
-      type: "user",
-      content: "Yes, please explain the main steps.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 23,
-      type: "ai",
-      content:
-        "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 24,
-      type: "user",
-      content: "Yes, please explain the main steps.",
-      timestamp: "10:02 AM",
-    },
-    {
-      id: 25,
-      type: "ai",
-      content:
-        "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-      timestamp: "10:02 AM",
-    },
-  ]);
+      title: 'New chat',
+      mode: 'search'
+    }
+  ])
+  const [popularQuestions, setPopularQuestions] = useState([])
+  const [messages, setMessages] = useState([]);
+
+  const resultRef = useRef("")
+  let codeBlockStarted;
+  let codeBlockTracker;
+  let newLineTracker;
 
 
-  const handleSend = () => {
-    if (!searchQuery.trim()) return;
-
-    const newMessage = {
-      id: messages.length + 1,
-      type: "user",
-      content: searchQuery,
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
-
-    setMessages([...messages, newMessage]);
-    setSearchQuery("");
+  const handleSend = (e) => {
+    e.preventDefault()
+    onSubmitNewMessage()
   };
 
-  const popularQuestions = [
-    { id: 1, text: 'What is the difference between mitosis and meiosis?' },
-    { id: 2, text: 'Explain Newton\'s three laws of motion' },
-    { id: 3, text: 'How does photosynthesis work?' },
-    { id: 4, text: 'What are the main causes of World War II?' }
-  ];
+  const onSubmitNewMessage = async () => {
+    if (searchQuery === "") return
+    setResponseLoading(true)
 
-  const recentChats = [
-    { id: 1, title: 'Biology basics' },
-    { id: 2, title: 'Physics homework' },
-    { id: 3, title: 'Chemistry questions' },
-    { id: 4, title: 'Math formulas' },
-  ];
+    if (currentMode === "search") {
+      setSearchQuery("");
+
+      await fetchData(
+        searchQuery,
+        "myId", // repalce with actual session id
+        currentMode,
+        messages
+      )
+    } else if (selectedSessionId === null && currentMode === "pyq") {
+      setSearchQuery("");
+      fetchPyqData(searchQuery)
+    } else {
+      console.log("else");
+    }
+  }
+
+  async function fetchData(userQuery, id, mode, prevChat) {
+    setResponseLoading(true)
+    const question = { content: userQuery, role: "user" };
+    const updatedChatList = [...(prevChat ?? chatList), question];
+
+    setMessages(updatedChatList);
+
+    const controller = new AbortController();
+
+    const serverBaseURL1 =
+      mode === "pyq"
+        ? "https://vector.mymeet.link/api/v1/vector/aifer/search"
+        : "https://aiferv2.mymeet.link/api/v1/stream/aifer-mithra/";
+
+    const email_id = localStorage.getItem("email");
+
+    const body = {
+      email_id,
+      stream: true,
+      messages: updatedChatList,
+      ref_id: id,
+    };
+
+    await fetchEventSource(serverBaseURL1, {
+      signal: controller.signal,
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: {
+        Accept: "*/*",
+        authority: "chat.openai.com",
+        "accept-language": "en-US,en;q=0.9,ml;q=0.8",
+        "Content-Type": "application/json",
+      },
+      async onopen(res) {
+        if (res.ok && res.status === 200) {
+        } else if (res.status >= 400 && res.status < 500 && res.status !== 429) {
+          controller.abort();
+        }
+      },
+      onmessage(event) {
+        if (event.data === "``") {
+          codeBlockTracker = "``";
+        } else if (event.data === "`") {
+          codeBlockTracker = `${codeBlockTracker}\``;
+        } else if (event.data === "```") {
+          codeBlockTracker = "```";
+        } else if (codeBlockTracker === "```") {
+          codeBlockStarted = !codeBlockStarted;
+          if (event.data != "") {
+            event.data = "";
+          }
+          resultRef.current = resultRef.current.replace(
+            "```",
+            codeBlockStarted
+              ? '<div class="code-snippet"><p class="code-copy"></p><pre><code class="language-markup">'
+              : "</code></pre></div>"
+          );
+          codeBlockTracker = undefined;
+        } else {
+          codeBlockTracker = undefined;
+        }
+
+        if (codeBlockStarted && event.data === "" && !codeBlockTracker) {
+          event.data = "\n";
+        }
+
+        if (event.data.includes("<")) {
+          event.data = event.data.replaceAll("<", "&lt;");
+        }
+
+        if (event.data.includes(">")) {
+          event.data = event.data.replaceAll(">", "&gt;");
+        }
+
+        if (event.data === "") {
+          if (newLineTracker === "") {
+            event.data = "\n\n";
+            newLineTracker = undefined;
+          } else {
+            newLineTracker = "";
+          }
+        } else {
+          newLineTracker = undefined;
+        }
+        if (event.data !== "[DONE]") {
+          if (codeBlockStarted) {
+            if (
+              resultRef.current.substring(resultRef.current.length - 19) ===
+              "</code></pre></div>"
+            ) {
+              const sliced = resultRef.current.slice(
+                0,
+                resultRef.current.length - 19
+              );
+              resultRef.current = sliced;
+            }
+          }
+          resultRef.current = (resultRef.current ?? "") + event.data ?? "";
+          const respondedChatItem = {
+            content: resultRef.current,
+            role: "assistant-remote",
+          };
+
+          setMessages([...updatedChatList, respondedChatItem]);
+          // console.log(respondedChatItem);
+
+        } else {
+          resultRef.current = "";
+          controller.abort();
+        }
+      },
+      onclose() {
+        resultRef.current = "";
+        console.log("Connection closed by the server");
+        controller.abort();
+      },
+      onerror(err) {
+        console.log("There was an error from the server", err);
+      },
+    });
+
+    setResponseLoading(false)
+  }
+
+
+  const fetchPyqData = async (query) => {
+    setResponseError("")
+    const question = { content: query, role: "user" };
+    setMessages([question])
+    try {
+      const { data } = await axios.post("https://vector.mymeet.link/api/v1/vector/aifer/searc", { query })
+
+      if (!data.most_similar_text || data.most_similar_text.length === 0) {
+        setResponseError("No results found");
+        setResponseLoading(false)
+        return;
+      }
+
+      setPopularQuestions(formattedPyqData(data))
+      setResponseLoading(false)
+
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setResponseLoading(false)
+      setResponseError("An error occurred while fetching data");
+    }
+
+  }
+
+  const formattedPyqData = (data) => {
+    return data.most_similar_text
+      .filter((_, index) => index !== 2) // Exclude the third item (Remove this if api is fixed. otherwise use the query "Inventory turnover ratio" to work properly.)
+      .map((item) => {
+        const originalDescription = item.description || "";
+
+        const questionMatch = originalDescription.match(/^\d+\s*\)\s*(.*?)\s*(?=\(a\))/i);
+        const optionsMatch = [...originalDescription.matchAll(/\(([a-d])\)\s(.*?)(?=\s*\([a-d]\)|\s*answer\s*:)/gi)];
+        const answerMatch = originalDescription.match(/answer\s*:\s*([a-d])/i);
+        const explanationMatch = originalDescription.match(/explanation\s*:\s*(.*)/is);
+
+        const formattedData = {
+          question: questionMatch ? questionMatch[1].trim() : '',
+          options: optionsMatch.map(match => ({ key: match[1], value: match[2].trim() })),
+          answer: answerMatch ? answerMatch[1] : '',
+          explanation: explanationMatch ? explanationMatch[1].trim() : ''
+        };
+
+        return {
+          ...item,
+          parsed: formattedData
+        };
+      });
+  }
+
+
+  const handleNewChat = () => {
+    const newChat = {
+      id: sessionHistory.length + 1,
+      title: "New chat",
+      mode: currentMode
+    }
+    setMessages([])
+    setSessionHistory((prev) => [...prev, newChat])
+  }
+
+  const handleRegenerate = async () => {
+    if (messages.length < 2) return; // Ensure there's a previous user query
+    const prevChat = messages.slice(0, -1); // Remove last AI response
+    const lastUserQuery = prevChat.pop();
+
+    if (lastUserQuery.role !== "user") return; // Ensure last message was from user
+
+    setResponseLoading(true);
+    await fetchData(lastUserQuery.content, selectedSearchResponseId?.current ?? 0, currentMode, prevChat);
+    setResponseLoading(false);
+  };
+
+
+  const handleSelectQuestion = (question) => {
+    const selectedQuestion = { content: question, role: "assistant-remote" };
+    setMessages((prev) => [...prev, selectedQuestion]);
+    setPopularQuestions([])
+  }
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  useEffect(() => {
+    setMessages([])
+  }, [currentMode])
+
   return (
     <div className="container-fluid">
       <div className="row">
         {/* Sidebar */}
-        <ChatSidebar isSidebarOpen={isSidebarOpen} recentChats={recentChats} toggleSidebar={toggleSidebar} />
+        <ChatSidebar
+          isSidebarOpen={isSidebarOpen}
+          history={sessionHistory}
+          toggleSidebar={toggleSidebar}
+          onNewChat={handleNewChat}
+        />
 
         {/* Main Chat Window */}
         <div className="col-md-9 col-lg-9 col-xl-10 px-0">
@@ -235,15 +301,33 @@ const Chat = () => {
               </div>
 
               {/* Tabs */}
-              <ChatTabs activeTab={activeTab} setActiveTab={setActiveTab} />
+              <ChatTabs
+                currentMode={currentMode}
+                setCurrentMode={setCurrentMode}
+              />
 
             </div>
 
             {/* Messages Area */}
-            <ChatMessages activeTab={activeTab} popularQuestions={popularQuestions} dummyMessages={messages} />
+            <ChatMessages
+              currentMode={currentMode}
+              popularQuestions={popularQuestions}
+              messages={messages}
+              responseLoading={responseLoading}
+              regenrateResponse={handleRegenerate}
+              onselectQuestion={handleSelectQuestion}
+              responseError={responseError}
+              formattedPyqData={formattedPyqData}
+            />
 
             {/* Input Area */}
-            <ChatInput searchQuery={searchQuery} setSearchQuery={setSearchQuery} activeTab={activeTab} sendMessage={handleSend} />
+            <ChatInput
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              currentMode={currentMode}
+              sendMessage={handleSend}
+              responseLoading={responseLoading}
+            />
 
           </div>
         </div>
@@ -253,377 +337,3 @@ const Chat = () => {
 };
 
 export default Chat;
-
-
-
-//       import React, {useEffect, useRef, useState} from 'react';
-//       import {FiMenu, FiSend} from 'react-icons/fi';
-//       import styles from './Chat.module.css';
-//       import Link from 'next/link';
-//       import {IoChatbubbleOutline, IoClose} from 'react-icons/io5';
-
-// const Chat = () => {
-//   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-//       const [activeTab, setActiveTab] = useState('search');
-//       const [searchQuery, setSearchQuery] = useState('');
-
-//       const chatBodyRef = useRef(null)
-
-//       const [messages, setMessages] = useState([
-//       {
-//         id: 1,
-//       type: "ai",
-//       content: "https://txp3t1rs-3000.inc1.devtunnels.ms/",
-//       timestamp: "10:00 AM",
-//     },
-//       {
-//         id: 2,
-//       type: "user",
-//       content: "I need help understanding photosynthesis.",
-//       timestamp: "10:01 AM",
-//     },
-//       {
-//         id: 3,
-//       type: "ai",
-//       content:
-//       "Photosynthesis is the process by which plants convert light energy into chemical energy. Would you like me to explain the key steps involved?",
-//       timestamp: "10:01 AM",
-//     },
-//       {
-//         id: 4,
-//       type: "user",
-//       content: "Yes, please explain the main steps.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 5,
-//       type: "ai",
-//       content:
-//       "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 6,
-//       type: "user",
-//       content: "Yes, please explain the main steps.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 7,
-//       type: "ai",
-//       content:
-//       "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 8,
-//       type: "user",
-//       content: "Yes, please explain the main steps.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 9,
-//       type: "ai",
-//       content:
-//       "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 10,
-//       type: "user",
-//       content: "Yes, please explain the main steps.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 11,
-//       type: "ai",
-//       content:
-//       "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 12,
-//       type: "user",
-//       content: "Yes, please explain the main steps.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 13,
-//       type: "ai",
-//       content:
-//       "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 14,
-//       type: "user",
-//       content: "Yes, please explain the main steps.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 15,
-//       type: "ai",
-//       content:
-//       "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 16,
-//       type: "user",
-//       content: "Yes, please explain the main steps.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 17,
-//       type: "ai",
-//       content:
-//       "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 18,
-//       type: "user",
-//       content: "Yes, please explain the main steps.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 19,
-//       type: "ai",
-//       content:
-//       "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 20,
-//       type: "user",
-//       content: "Yes, please explain the main steps.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 21,
-//       type: "ai",
-//       content:
-//       "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 22,
-//       type: "user",
-//       content: "Yes, please explain the main steps.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 23,
-//       type: "ai",
-//       content:
-//       "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 24,
-//       type: "user",
-//       content: "Yes, please explain the main steps.",
-//       timestamp: "10:02 AM",
-//     },
-//       {
-//         id: 25,
-//       type: "ai",
-//       content:
-//       "There are two main stages in photosynthesis:\n\n1. Light-dependent reactions: These occur in the thylakoid membrane and convert light energy into chemical energy (ATP and NADPH).\n\n2. Light-independent reactions (Calvin cycle): These occur in the stroma and use the ATP and NADPH to convert CO2 into glucose.",
-//       timestamp: "10:02 AM",
-//     },
-//       ]);
-
-
-//   const handleSend = () => {
-//     if (!searchQuery.trim()) return;
-
-//       const newMessage = {
-//         id: messages.length + 1,
-//       type: "user",
-//       content: searchQuery,
-//       timestamp: new Date().toLocaleTimeString([], {hour: "2-digit", minute: "2-digit" }),
-//     };
-
-//       setMessages([...messages, newMessage]);
-//       setSearchQuery("");
-//   };
-
-//       const popularQuestions = [
-//       {id: 1, text: 'What is the difference between mitosis and meiosis?' },
-//       {id: 2, text: 'Explain Newton\'s three laws of motion' },
-//       {id: 3, text: 'How does photosynthesis work?' },
-//       {id: 4, text: 'What are the main causes of World War II?' }
-//       ];
-
-//       const recentChats = [
-//       {id: 1, title: 'Biology basics' },
-//       {id: 2, title: 'Physics homework' },
-//       {id: 3, title: 'Chemistry questions' },
-//       {id: 4, title: 'Math formulas' },
-//       ];
-
-//   const toggleSidebar = () => {
-//         setIsSidebarOpen(!isSidebarOpen);
-//   };
-
-//   useEffect(() => {
-//     // to scroll to bottom
-//     if (chatBodyRef.current) {
-//         chatBodyRef.current.scrollTop = chatBodyRef.current.scrollHeight;
-//     }
-//   }, [messages]);
-
-//       return (
-//       <div className="container-fluid">
-//         <div className="row">
-//           {/* Sidebar */}
-//           <div className={`col-md-3 col-lg-3 col-xl-2 px-0 ${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : ''}`}>
-//             <div className="p-3">
-//               <div className="d-flex justify-content-between">
-//                 <Link href="/" className="navbar-brand align-items-center mb-4 d-none d-md-flex">
-//                   <img
-//                     className={styles.logo}
-//                     src="/emo-logo.png" alt="emo" />
-//                 </Link>
-//                 <img src='/circleavatar.png' alt='avatar' className={`${styles.avatar} d-md-none`} />
-//                 <button
-//                   onClick={toggleSidebar}
-//                   className={`d-md-none ${styles.closeButton}`}>
-//                   <IoClose size={26} />
-//                 </button>
-//               </div>
-//               <button
-//                 //  onClick={addNewChat}
-//                 className="primary-btn w-100 mb-4">+ New Chat</button>
-//               <h6 className="text-muted mb-0">Recent Chats</h6>
-//               <div className={styles.chatHistory}>
-//                 {recentChats.map(chat => (
-//                   <div key={chat.id} className={styles.chatHistoryItem}>
-//                     <IoChatbubbleOutline /> {chat.title}
-//                   </div>
-//                 ))}
-//               </div>
-//             </div>
-//           </div>
-
-
-//           {/* Main Chat Window */}
-//           <div className="col-md-9 col-lg-9 col-xl-10 px-0">
-//             <div className={styles.chatWindow}>
-//               <div className={styles.headers}>
-//                 {/* Mobile Header */}
-//                 <div
-//                   className={`${styles.mobileHeader} d-md-none px-3 py-0 mb-0 border-bottom d-flex justify-content-between mt-2`}>
-//                   <Link href="/" className="navbar-brand align-items-center">
-//                     <img
-//                       className={styles.logo}
-//                       src="/emo-logo.png" alt="emo" />
-//                   </Link>
-//                   <button className={`${styles.closeButton} mt-2`} onClick={toggleSidebar}>
-//                     <FiMenu size={26} />
-//                   </button>
-//                 </div>
-
-//                 {/* Tabs */}
-//                 <div className={`${styles.tabs} py-2 bg-light`}>
-//                   <div className="d-flex justify-content-between">
-//                     <div
-//                       className={styles.tabButtons}
-//                     >
-//                       <button
-//                         className={`${activeTab === 'search' ? styles.active : styles.inActive}`}
-//                         onClick={() => setActiveTab('search')}
-//                       >Search</button>
-//                       <button
-//                         className={`ms-2 ${activeTab === 'pyq' ? styles.active : styles.inActive}`}
-//                         onClick={() => setActiveTab('pyq')}
-//                       >PYQ</button>
-//                     </div>
-
-//                     {/* <button className={styles.settingsIcon}>
-//           <IoSettingsOutline size={20} />
-//         </button> */}
-//                     <img src='/circleavatar.png' alt='avatar' className={`${styles.avatar} d-none d-md-flex`} />
-//                   </div>
-//                 </div>
-//               </div>
-
-
-//               {/* Messages Area */}
-//               <div className={`${styles.messages}`} ref={chatBodyRef}>
-//                 {activeTab === 'search' ? (
-//                   <div>
-//                     {messages.length > 0 ?
-//                       messages.map(message => (
-//                         <div
-//                           key={message.id}
-//                           className={`${styles.message} ${message.type === 'ai' ? styles.aiMessage : styles.userMessage
-//                             }`}
-//                         >
-//                           <div className={styles.messageContent}>
-//                             {message.content}
-//                           </div>
-//                         </div>
-//                       )) :
-//                       <div className='text-center mt-5'>
-//                         <img src="/emo-logo.png" alt="Emo" className={styles.bgLogo} />
-//                         <h4
-//                           style={{ color: "rgb(185 185 185)" }}
-//                           className='mt-3 fw-semibold'
-//                         >Start chat with Emo</h4>
-//                         <h5
-//                           style={{ color: "rgb(185 185 185)" }}
-//                           className='fw-normal'
-//                         >Type something to start chat with Emo</h5>
-//                       </div>
-//                     }
-//                   </div>
-//                 ) : (
-//                   <div className={styles.popularQuestions}>
-//                     <h5 className="mb-4 fw-bold text-center">Popular Questions</h5>
-//                     <div className="row g-3">
-//                       {popularQuestions.map(question => (
-//                         <div key={question.id} className="col-12">
-//                           <div className={`card border-0 ${styles.questionCard}`}>
-//                             <div className="card-body">
-//                               <p className="mb-0">{question.text}</p>
-//                             </div>
-//                           </div>
-//                         </div>
-//                       ))}
-//                     </div>
-//                   </div>
-//                 )}
-//               </div>
-
-
-//               {/* Input Area */}
-//               <div className={styles.inputContainer}>
-//                 <div className={`d-flex gap-1 ${styles.searchInput}`}>
-//                   <input
-//                     type="text"
-//                     className={`form-control ${styles.formControl}`}
-//                     placeholder="Ask a question..."
-//                     value={searchQuery}
-//                     onChange={(e) => setSearchQuery(e.target.value)}
-//                   />
-//                   <button
-//                     // onClick={sendMessage}
-//                     disabled={!searchQuery}
-//                     onClick={handleSend}
-//                     className={`${styles.searchButton}`}>
-//                     <FiSend size={23} />
-//                   </button>
-//                 </div>
-//               </div>
-
-
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//       );
-// };
-
-//       export default Chat;
