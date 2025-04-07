@@ -77,6 +77,8 @@ const ChatMessages = ({
     } else {
       document.body.style.overflow = "auto";
     }
+
+    return () => document.body.style.overflow = "auto";
   }, [messages]);
 
   const formatMessage = (content) => {

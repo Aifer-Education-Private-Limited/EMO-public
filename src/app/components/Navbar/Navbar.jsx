@@ -37,6 +37,14 @@ export default function Navbar() {
     window.location.reload();
   };
 
+  const scrollToHash = (id) => {
+    const target = document.getElementById(id);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth" });
+      window.history.pushState(null, "", `#${id}`);
+    }
+  }
+
   useEffect(() => {
     handleRedux();
   }, [])
@@ -70,11 +78,11 @@ export default function Navbar() {
               className={`${styles.freeTrialBtn}`}
             >Start Free Trial</button></a>
             {user && userDetails ? (
-              <div className={styles.userDropdown} 
-              ref={dropdownRef}
+              <div className={styles.userDropdown}
+                ref={dropdownRef}
               >
-                <button className={styles.userBtn} 
-                onClick={toggleUserDropdown}
+                <button className={styles.userBtn}
+                  onClick={toggleUserDropdown}
                 >
                   {userDetails.name?.split(" ")[0]} &nbsp;
                   {userDropdownOpen ? <IoIosArrowUp /> : <IoIosArrowDown />}
@@ -110,8 +118,9 @@ export default function Navbar() {
                   className={styles.navLink}
                   data-bs-toggle="collapse"
                   data-bs-target="#navbarNav"
-                  onClick={() => {
-                    window.location.hash = "#features";
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToHash("features");
                   }}
                 >Features</a>
               </li>
@@ -121,26 +130,16 @@ export default function Navbar() {
                   className={styles.navLink}
                   data-bs-toggle="collapse"
                   data-bs-target="#navbarNav"
-                  onClick={() => {
-                    window.location.hash = "#pricing";
+                  onClick={(e) => {
+                    e.preventDefault();
+                    scrollToHash("pricing");
                   }}
                 >Pricing</a>
               </li>
               <li className="nav-item">
                 <a
-                  href="#about"
                   className={styles.navLink}
-                  data-bs-toggle="collapse"
-                  data-bs-target="#navbarNav"
-                  onClick={() => {
-                    window.location.hash = "#about";
-                  }}
-                >About</a>
-              </li>
-              <li className="nav-item">
-                <a
-                  href="#about"
-                  className={styles.navLink}
+                  style={{cursor: "pointer"}}
                   data-bs-toggle="collapse"
                   data-bs-target="#navbarNav"
                   onClick={() => router.push("/chat")}
