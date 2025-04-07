@@ -43,11 +43,10 @@ const Chat = () => {
   const onSubmitNewMessage = async () => {
     if (searchQuery === "") return
     setResponseLoading(true)
-    setShowPopularQuestions(true)
-
+    
     if (currentMode === "search") {
       setSearchQuery("");
-
+      
       await fetchData(
         searchQuery,
         "myId", // repalce with actual session id
@@ -55,6 +54,7 @@ const Chat = () => {
         messages
       )
     } else if (selectedSessionId === null && currentMode === "pyq") {
+      setShowPopularQuestions(true)
       setSearchQuery("");
       const question = { content: searchQuery, role: "user" };
       setMessages((prev) => [...prev, question]);
