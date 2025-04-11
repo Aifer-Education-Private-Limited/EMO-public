@@ -19,6 +19,7 @@ export default function Navbar() {
   const [showLogin, setShowLogin] = useState(false)
   const [user, setUser] = useState(false)
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   const toggleShowLogin = () => setShowLogin(!showLogin)
   const toggleUserDropdown = () => setUserDropdownOpen(!userDropdownOpen);
@@ -57,8 +58,17 @@ export default function Navbar() {
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("resize", handleResize);
     };
   }, []);
 
@@ -74,9 +84,9 @@ export default function Navbar() {
 
           {/* MOBILE VIEW */}
           <div className="d-md-none d-flex gap-1 ms-auto align-items-center">
-            <a href="#pricing"><button
-              className={`${styles.freeTrialBtn}`}
-            >Start Free Trial</button></a>
+              <a href="#pricing"><button
+                className={`${styles.freeTrialBtn}`}
+              >Start Free Trial</button></a>
             {user && userDetails ? (
               <div className={styles.userDropdown}
                 ref={dropdownRef}
@@ -116,8 +126,10 @@ export default function Navbar() {
                 <a
                   href="#features"
                   className={styles.navLink}
-                  data-bs-toggle="collapse"
-                  data-bs-target="#navbarNav"
+                  {...(isMobile && {
+                    "data-bs-toggle": "collapse",
+                    "data-bs-target": "#navbarNav",
+                  })}
                   onClick={(e) => {
                     e.preventDefault();
                     scrollToHash("features");
@@ -128,8 +140,10 @@ export default function Navbar() {
                 <a
                   href="#pricing"
                   className={styles.navLink}
-                  data-bs-toggle="collapse"
-                  data-bs-target="#navbarNav"
+                  {...(isMobile && {
+                    "data-bs-toggle": "collapse",
+                    "data-bs-target": "#navbarNav",
+                  })}
                   onClick={(e) => {
                     e.preventDefault();
                     scrollToHash("pricing");
@@ -150,9 +164,9 @@ export default function Navbar() {
 
           {/* DESKTOP VIEW */}
           <div className="d-none d-md-flex">
-            <a href="#pricing"><button
-              className={`${styles.freeTrialBtn} me-1`}
-            >Start Free Trial</button></a>
+              <a href="#pricing"><button
+                className={`${styles.freeTrialBtn} me-1`}
+              >Start Free Trial</button></a>
             {user && userDetails ? (
               <div className={styles.userDropdown} ref={dropdownRef}>
                 <button className={styles.userBtn} onClick={toggleUserDropdown}>

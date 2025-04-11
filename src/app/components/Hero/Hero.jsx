@@ -13,10 +13,11 @@ const Hero = () => {
               <p className={styles.heroText}>
                 Get instant answers, personalized study plans, and expert guidance powered by AI
               </p>
-              <a href="#pricing"><button
-                style={{ fontSize: "1rem" }}
-                className={`primary-btn px-md-4 py-md-3 ${styles.freeTrialBtn}`}
-              >Start Free Trial</button></a>
+              <a href="#pricing">
+                <button
+                  style={{ fontSize: "1rem" }}
+                  className={`primary-btn px-md-4 py-md-3 ${styles.freeTrialBtn}`}
+                >Start Free Trial</button></a>
               <p className={styles.noCredit}>* No credit card required</p>
             </div>
           </div>
