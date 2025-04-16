@@ -7,9 +7,18 @@ import Link from 'next/link';
 
 const ChatSidebar = ({ isSidebarOpen, history, toggleSidebar, onNewChat }) => {
     const [openChatOptions, setOpenChatOptions] = useState(null);
+    const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
     const toggleChatOptions = (chatId) => {
         setOpenChatOptions(openChatOptions === chatId ? null : chatId);
+    };
+
+    const toggleUserDropdown = () => setUserDropdownOpen(!userDropdownOpen);
+  
+    const userLogout = () => {
+      localStorage.removeItem("studentToken");
+      localStorage.removeItem("Name");
+      window.location.href = '/';
     };
 
     return (
@@ -22,7 +31,19 @@ const ChatSidebar = ({ isSidebarOpen, history, toggleSidebar, onNewChat }) => {
                             src="/emo-logo.png" alt="emo"
                         />
                     </Link>
-                    <img src='/circleavatar.png' alt='avatar' className={`${styles.avatar} d-md-none`} />
+                    <div className={styles.userAvatar}>
+                        <img onClick={toggleUserDropdown} src='/circleavatar.png' alt='avatar' className={`${styles.avatar} d-md-none`} />
+                        {userDropdownOpen && (
+                            <ul className={styles.dropdownMenuSidebar}>
+                                <li onClick={userLogout}>
+                                    <button className={styles.logoutBtn}>
+                                        Logout
+                                    </button>
+                                </li>
+                            </ul>
+                        )}
+                    </div>
+
                     <button
                         onClick={toggleSidebar}
                         className={`d-md-none ${styles.closeButton}`}>

@@ -1,8 +1,8 @@
 'use client'
 
+import Chat from '@/app/components/Chat/Chat'
+import ProtectedRoute from '@/app/components/ProtectedRoute'
 import { usePathname } from 'next/navigation'
-import ProtectedRoute from '../components/ProtectedRoute'
-import Chat from '../components/Chat/Chat'
 
 const Page = () => {
     const route = usePathname()

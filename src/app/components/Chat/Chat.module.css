@@ -139,12 +139,17 @@
 
 
 .avatar {
+  position: relative;
   width: 40px;
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
   cursor: pointer;
   border: 1px solid #b7b7b7;
+}
+
+.userAvatar{
+  position: relative;
 }
 
 .popularQuestions {
@@ -313,6 +318,58 @@
   padding: 20px 15px;
   border-radius: 10px;
   border: red 1px solid;
+}
+
+.userDropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: white;
+  border-radius: 15px;
+  width: 150px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  padding: 5px 0;
+}
+
+.dropdownMenu li,
+.dropdownMenuSidebar li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dropdownMenu li:hover,
+.dropdownMenuSidebar li:hover {
+  background-color: #f0f0f0;
+}
+
+.dropdownMenu li a,
+.dropdownMenuSidebar li a{
+  text-decoration: none;
+  color: black;
+  font-weight: 500;
+}
+
+.logoutBtn{
+  border: none;
+  background: transparent;
+  font-weight: 500;
+}
+
+.dropdownMenuSidebar{
+  position: absolute;
+  top: 100%;
+  background-color: white;
+  border-radius: 15px;
+  width: 150px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  padding: 5px 0;
 }
 
 @media  (max-width: 1200px) {

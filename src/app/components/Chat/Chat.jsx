@@ -1,4 +1,4 @@
-import React, { use, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FiMenu } from 'react-icons/fi';
 import styles from './Chat.module.css';
 import ChatSidebar from './ChatSidebar';
@@ -8,12 +8,16 @@ import ChatInput from './ChatInput';
 import Link from 'next/link';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import axios from 'axios';
+import { useParams } from 'next/navigation';
 
 const Chat = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [currentMode, setCurrentMode] = useState('search');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSessionId, setSelectedSessionId] = useState(null);
+  // const [selectedSessionId, setSelectedSessionId] = useState(null);
+  const {chatid} = useParams()
+  console.log(chatid);
+  
   const [responseLoading, setResponseLoading] = useState(false)
   const [responseError, setResponseError] = useState("")
   const selectedSearchResponseId = useRef(0);

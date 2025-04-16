@@ -1,7 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './Chat.module.css'
 
 const ChatTabs = ({ currentMode, setCurrentMode }) => {
+  const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+  const toggleUserDropdown = () => setUserDropdownOpen(!userDropdownOpen);
+
+  const userLogout = () => {
+    localStorage.removeItem("studentToken");
+    localStorage.removeItem("Name");
+    window.location.href = '/';
+  };
+
   return (
     <div className={`${styles.tabs} py-2 bg-light`}>
       <div className="d-flex justify-content-between">
@@ -18,10 +27,21 @@ const ChatTabs = ({ currentMode, setCurrentMode }) => {
           >PYQ</button>
         </div>
 
-        {/* <button className={styles.settingsIcon}>
-          <IoSettingsOutline size={20} />
-        </button> */}
-        <img src='/circleavatar.png' alt='avatar' className={`${styles.avatar} d-none d-md-flex`} />
+        <img
+          src='/circleavatar.png'
+          alt='avatar'
+          onClick={toggleUserDropdown}
+          className={`${styles.avatar} d-none d-md-flex`}
+        />
+        {userDropdownOpen && (
+          <ul className={styles.dropdownMenu}>
+            <li onClick={userLogout}>
+              <button className={styles.logoutBtn}>
+                Logout
+              </button>
+            </li>
+          </ul>
+        )}
       </div>
     </div>
   );
