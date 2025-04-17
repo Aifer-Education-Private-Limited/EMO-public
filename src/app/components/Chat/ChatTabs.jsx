@@ -1,9 +1,20 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './Chat.module.css'
+import { useDispatch } from 'react-redux';
+import { clearMessages, setCurrentMode } from '@/app/constants/features/chat';
+import { useRouter } from 'next/navigation';
 
-const ChatTabs = ({ currentMode, setCurrentMode }) => {
+const ChatTabs = ({ currentMode }) => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const toggleUserDropdown = () => setUserDropdownOpen(!userDropdownOpen);
+  const dispatch = useDispatch();
+  const router = useRouter()
+
+  const changeCurrentMode = (mode) => {
+    dispatch(setCurrentMode(mode));
+    dispatch(clearMessages());
+    router.push('/chat');
+  }
 
   const userLogout = () => {
     localStorage.removeItem("studentToken");
@@ -19,11 +30,11 @@ const ChatTabs = ({ currentMode, setCurrentMode }) => {
         >
           <button
             className={`${currentMode === 'search' ? styles.active : styles.inActive}`}
-            onClick={() => setCurrentMode('search')}
+            onClick={() => changeCurrentMode('search')}
           >Search</button>
           <button
             className={`ms-2 ${currentMode === 'pyq' ? styles.active : styles.inActive}`}
-            onClick={() => setCurrentMode('pyq')}
+            onClick={() => changeCurrentMode('pyq')}
           >PYQ</button>
         </div>
 

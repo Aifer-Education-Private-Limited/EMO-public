@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { use, useEffect, useRef, useState } from 'react';
 import { FiMenu } from 'react-icons/fi';
 import styles from './Chat.module.css';
 import ChatSidebar from './ChatSidebar';
@@ -8,60 +8,75 @@ import ChatInput from './ChatInput';
 import Link from 'next/link';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import axios from 'axios';
-import { useParams } from 'next/navigation';
+import aiferAxios from '../../constants/axios'
+import { useParams, useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
+import {
+  addChatHistory,
+  addMessage,
+  clearMessages,
+  incrementChatCountToday,
+  moveSessionToTop,
+  setChatCountToday,
+  setChatHistory,
+  setCurrentMode,
+  setSelectedSession,
+  setSelectedSessionId,
+  updateLastAssistantMessage
+} from '@/app/constants/features/chat';
 
 const Chat = () => {
+  const dispatch = useDispatch()
+  const userDetails = useSelector((state) => state.user.value);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const [currentMode, setCurrentMode] = useState('search');
   const [searchQuery, setSearchQuery] = useState('');
-  // const [selectedSessionId, setSelectedSessionId] = useState(null);
-  const {chatid} = useParams()
-  console.log(chatid);
-  
+  const { chatid } = useParams()
+  const selectedSessionId = useSelector((state) => state.chat.selectedSessionId);
+
   const [responseLoading, setResponseLoading] = useState(false)
   const [responseError, setResponseError] = useState("")
   const selectedSearchResponseId = useRef(0);
   const [showPopularQuestions, setShowPopularQuestions] = useState(false)
   const [lastQuery, setLastQuery] = useState("")
-  const [sessionHistory, setSessionHistory] = useState([
-    {
-      id: 1,
-      title: 'New chat',
-      mode: 'search'
-    }
-  ])
   const [popularQuestions, setPopularQuestions] = useState([])
-  const [messages, setMessages] = useState([]);
+  const messages = useSelector((state) => state.chat.messages);
+  const { currentMode, chatCountToday, chatHistory } = useSelector((state) => state.chat);
+
+  const router = useRouter()
 
   const resultRef = useRef("")
   let codeBlockStarted;
   let codeBlockTracker;
   let newLineTracker;
 
-
   const handleSend = (e) => {
     e.preventDefault()
+    if (chatCountToday >= 5) {
+      alert("You have reached the limit of 5 queries today. Please upgrade to premium for unlimited access.") // REPLACE WITH TOAST MESSAGE
+      return
+    }
     onSubmitNewMessage()
   };
 
   const onSubmitNewMessage = async () => {
     if (searchQuery === "") return
     setResponseLoading(true)
-    
+
     if (currentMode === "search") {
       setSearchQuery("");
-      
+
       await fetchData(
         searchQuery,
-        "myId", // repalce with actual session id
+        selectedSessionId || 1, // repalce with actual session id
         currentMode,
         messages
       )
-    } else if (selectedSessionId === null && currentMode === "pyq") {
+    } else if (
+      currentMode === "pyq") {
       setShowPopularQuestions(true)
       setSearchQuery("");
       const question = { content: searchQuery, role: "user" };
-      setMessages((prev) => [...prev, question]);
+      dispatch(addMessage(question));
       fetchPyqData(searchQuery)
     } else {
       console.log("else");
@@ -71,9 +86,9 @@ const Chat = () => {
   async function fetchData(userQuery, id, mode, prevChat) {
     setResponseLoading(true)
     const question = { content: userQuery, role: "user" };
-    const updatedChatList = [...(prevChat ?? chatList), question];
+    const updatedChatList = [...(prevChat ?? messages), question];
 
-    setMessages(updatedChatList);
+    dispatch(addMessage(question));
 
     const controller = new AbortController();
 
@@ -171,17 +186,26 @@ const Chat = () => {
             role: "assistant-remote",
           };
 
-          setMessages([...updatedChatList, respondedChatItem]);
-          // console.log(respondedChatItem);
+          if (resultRef.current.length === event.data.length) {
+            dispatch(addMessage(respondedChatItem));
+          } else {
+            dispatch(updateLastAssistantMessage(resultRef.current));
+          }
 
         } else {
+          const finalMessages = [
+            ...updatedChatList,
+            { content: resultRef.current, role: "assistant-remote" },
+          ];
+
+          saveMessages(finalMessages);
+
           resultRef.current = "";
           controller.abort();
         }
       },
       onclose() {
         resultRef.current = "";
-        console.log("Connection closed by the server");
         controller.abort();
       },
       onerror(err) {
@@ -191,6 +215,59 @@ const Chat = () => {
 
     setResponseLoading(false)
   }
+
+  const createNewSession = async () => {
+    const body = {
+      userId: userDetails.firebase_uid,
+      mode: currentMode,
+      title: "New chat",
+    }
+    try {
+
+      const { data } = await aiferAxios.post("/api/emo/createChat", body)
+
+      router.push(`/chat/${data.data._id}`)
+      dispatch(setSelectedSessionId(data.data._id))
+      dispatch(addChatHistory(data.data))
+
+      return data.data._id;
+    } catch (error) {
+      console.log(error, "error in creating new session");
+    }
+  }
+
+  const saveMessages = async (messages) => {
+    try {
+      let sessionId = selectedSessionId;
+
+      if (messages.length < 2) {
+        return;
+      } else if (messages.length === 2 && !chatid) {
+        sessionId = await createNewSession()
+      }
+
+      const lastTwoMessages = messages.slice(-2);
+      const conversation = lastTwoMessages.map((msg) => ({
+        sender: msg.role === "user" ? "user" : "assistant-remote",
+        content: msg.content,
+      }));
+
+      const body = {
+        conversation: conversation,
+      };
+
+      await aiferAxios.post(`/api/emo/saveMessages/${sessionId}`, body);
+
+      dispatch(moveSessionToTop())
+
+      if (!userDetails.premium) {
+        dispatch(incrementChatCountToday())
+      }
+
+    } catch (error) {
+      console.error("❌ Failed to save messages", error);
+    }
+  };
 
 
   const fetchPyqData = async (query) => {
@@ -243,13 +320,8 @@ const Chat = () => {
 
 
   const handleNewChat = () => {
-    const newChat = {
-      id: sessionHistory.length + 1,
-      title: "New chat",
-      mode: currentMode
-    }
-    setMessages([])
-    setSessionHistory((prev) => [...prev, newChat])
+    dispatch(clearMessages())
+    router.push("/chat")
   }
 
   const handleRegenerate = async () => {
@@ -258,11 +330,11 @@ const Chat = () => {
         fetchPyqData(lastQuery);
       }
     } else {
-      if (messages.length < 2) return; // Ensure there's a previous user query
-      const prevChat = messages.slice(0, -1); // Remove last AI response
+      if (messages.length < 2) return;
+      const prevChat = messages.slice(0, -1);
       const lastUserQuery = prevChat.pop();
 
-      if (lastUserQuery.role !== "user") return; // Ensure last message was from user
+      if (lastUserQuery.role !== "user") return;
 
       setResponseLoading(true);
       await fetchData(lastUserQuery.content, selectedSearchResponseId?.current ?? 0, currentMode, prevChat);
@@ -274,7 +346,9 @@ const Chat = () => {
   const handleSelectQuestion = (question) => {
     setShowPopularQuestions(false)
     const selectedQuestion = { content: question, role: "assistant-remote" };
-    setMessages((prev) => [...prev, selectedQuestion]);
+    saveMessages([...messages, selectedQuestion])
+
+    dispatch(addMessage(selectedQuestion));
     setPopularQuestions([])
   }
 
@@ -282,10 +356,110 @@ const Chat = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const getSession = async (sessionId) => {
+    try {
+      const { data } = await aiferAxios.get(`/api/emo/session/${sessionId}`)
+
+      if (data.success) {
+        if (data.data.mode === "pyq") {
+          dispatch(setCurrentMode("pyq"))
+        } else {
+          dispatch(setCurrentMode("search"))
+        }
+        dispatch(setSelectedSession(data.data))
+      } else {
+        router.push("/chat")
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const fetchMessages = async (id) => {
+    try {
+      const { data } = await aiferAxios.get(`/api/emo/chat/${id}`)
+
+      if (data.success) {
+        dispatch(clearMessages())
+        data.data.forEach((item) => {
+          item.messages.forEach((message) => {
+            const formattedMessages = {
+              _id: item._id,
+              content: message.content,
+              role: message.sender === "user" ? "user" : "assistant-remote",
+            };
+            dispatch(addMessage(formattedMessages));
+          })
+
+        })
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getChatCountToday = async () => {
+    try {
+      const { data } = await aiferAxios.get(`/api/emo/conversationsCountToday/${userDetails.firebase_uid}`)
+
+      if (data.success) {
+        dispatch(setChatCountToday(data.count))
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const getChatHistory = async () => {
+    try {
+      const { data } = await aiferAxios.get(`/api/emo/chatHistory/${userDetails.firebase_uid}`, {
+        params: {
+          limit: 10,
+          page: 1,
+        },
+      });
+
+      if (data.success) {
+        dispatch(setChatHistory(data.data))
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  const handleSelectSession = (id) => {
+    if (id === selectedSessionId) return
+    dispatch(clearMessages())
+    dispatch(setSelectedSessionId(id))
+    getSession(id)
+    router.push(`/chat/${id}`)
+  }
+
   useEffect(() => {
-    setMessages([])
     setShowPopularQuestions(false)
   }, [currentMode])
+
+  useEffect(() => {
+    if (chatid) {
+      dispatch(setSelectedSessionId(chatid))
+      getSession(chatid)
+    }
+    if (chatid && messages.length === 0) {
+      fetchMessages(chatid)
+    }
+  }, [chatid])
+
+  useEffect(() => {
+    if (userDetails && !userDetails.premium) {
+      getChatCountToday()
+    }
+  }, [userDetails])
+
+  useEffect(() => {
+    if (userDetails.firebase_uid && chatHistory.length === 0) {
+      getChatHistory()
+    }
+  }, [userDetails])
 
   return (
     <div className="container-fluid">
@@ -293,9 +467,10 @@ const Chat = () => {
         {/* Sidebar */}
         <ChatSidebar
           isSidebarOpen={isSidebarOpen}
-          history={sessionHistory}
+          history={chatHistory}
           toggleSidebar={toggleSidebar}
           onNewChat={handleNewChat}
+          handleSelectSession={handleSelectSession}
         />
 
         {/* Main Chat Window */}
@@ -319,7 +494,6 @@ const Chat = () => {
               {/* Tabs */}
               <ChatTabs
                 currentMode={currentMode}
-                setCurrentMode={setCurrentMode}
               />
 
             </div>
@@ -328,7 +502,6 @@ const Chat = () => {
             <ChatMessages
               currentMode={currentMode}
               popularQuestions={popularQuestions}
-              messages={messages}
               responseLoading={responseLoading}
               regenrateResponse={handleRegenerate}
               onselectQuestion={handleSelectQuestion}

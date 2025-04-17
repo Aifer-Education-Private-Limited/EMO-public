@@ -220,7 +220,7 @@
 
 .message {
   display: flex;
-  margin: 25px 0;
+  margin: 2px 0;
 }
 
 .userMessage {
@@ -381,11 +381,11 @@
 @media (max-width: 768px) {
 
   .message {
-    margin: 10px 0;
+    margin: 1px 0;
   }
 
   .aiMessage {
-    margin-bottom: 20px;
+    margin-bottom: 1px;
   }
 
   .messageContent {

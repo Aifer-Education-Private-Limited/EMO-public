@@ -5,7 +5,7 @@ import { SiBookstack } from "react-icons/si";
 import { BiDotsHorizontalRounded } from "react-icons/bi";
 import Link from 'next/link';
 
-const ChatSidebar = ({ isSidebarOpen, history, toggleSidebar, onNewChat }) => {
+const ChatSidebar = ({ isSidebarOpen, history, toggleSidebar, onNewChat, handleSelectSession }) => {
     const [openChatOptions, setOpenChatOptions] = useState(null);
     const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
@@ -14,11 +14,11 @@ const ChatSidebar = ({ isSidebarOpen, history, toggleSidebar, onNewChat }) => {
     };
 
     const toggleUserDropdown = () => setUserDropdownOpen(!userDropdownOpen);
-  
+
     const userLogout = () => {
-      localStorage.removeItem("studentToken");
-      localStorage.removeItem("Name");
-      window.location.href = '/';
+        localStorage.removeItem("studentToken");
+        localStorage.removeItem("Name");
+        window.location.href = '/';
     };
 
     return (
@@ -59,20 +59,26 @@ const ChatSidebar = ({ isSidebarOpen, history, toggleSidebar, onNewChat }) => {
                 >+ New Chat</button>
                 <h6 className="text-muted mb-0">Recent Chats</h6>
                 <div className={styles.chatHistory}>
-                    {history.map(chat => (
+                    {history.map((chat, index) => (
                         <div
-                            key={chat.id} className={`${styles.chatHistoryItem} d-flex justify-content-between`}>
+                            onClick={() => handleSelectSession(chat._id)}
+                            key={index}
+                            className={`${styles.chatHistoryItem} d-flex justify-content-between`}
+                        >
                             <span>{chat.mode === "search" ? <IoSearchSharp /> : <SiBookstack />} {chat.title}</span>
 
                             <div className={`${styles.right} position-relative`}>
                                 <button
-                                    onClick={() => toggleChatOptions(chat.id)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleChatOptions(chat._id)
+                                    }}
                                     className={styles.optionsBtn}
                                 ><BiDotsHorizontalRounded size={20} /></button>
-                                {openChatOptions === chat.id && (
+                                {openChatOptions === chat._id && (
                                     <div className={styles.optionsMenu}>
-                                        <button onClick={() => console.log("Rename", chat.id)}>Rename</button>
-                                        <button onClick={() => console.log("Delete", chat.id)}>Delete</button>
+                                        <button onClick={() => console.log("Rename", chat._id)}>Rename</button>
+                                        <button onClick={() => console.log("Delete", chat._id)}>Delete</button>
                                     </div>
                                 )}
                             </div>
