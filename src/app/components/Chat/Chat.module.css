@@ -2,7 +2,21 @@
   height: 100vh;
   background: rgb(248, 249, 250);
   transition: all 0.3s ease;
+  /* overflow-y: auto; */
+}
+
+.chatHistory {
+  max-height: calc(100vh - 250px); /* Adjust as needed */
   overflow-y: auto;
+}
+
+.dateLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: #888;
+  padding: 8px 10px 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .closeButton {

@@ -25,6 +25,7 @@ import {
   setCurrentMode,
   setSelectedSession,
   setSelectedSessionId,
+  setTotalChatCount,
   updateLastAssistantMessage
 } from '@/app/constants/features/chat';
 
@@ -33,6 +34,7 @@ const Chat = () => {
   const userDetails = useSelector((state) => state.user.value);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
   const { chatid } = useParams()
   const selectedSessionId = useSelector((state) => state.chat.selectedSessionId);
 
@@ -431,13 +433,18 @@ const Chat = () => {
     try {
       const { data } = await aiferAxios.get(`/api/emo/chatHistory/${userDetails.firebase_uid}`, {
         params: {
-          limit: 10,
-          page: 1,
+          limit: 15,
+          page,
         },
       });
 
       if (data.success) {
-        dispatch(setChatHistory(data.data))
+        if (page === 1) {
+          dispatch(setChatHistory(data.data))
+          dispatch(setTotalChatCount(data.pagination.total))
+        } else {
+          dispatch(setChatHistory([...chatHistory, ...data.data]))
+        }
       }
     } catch (error) {
       console.log(error);
@@ -529,7 +536,12 @@ const Chat = () => {
     if (userDetails.firebase_uid && chatHistory.length === 0) {
       getChatHistory()
     }
-  }, [userDetails])
+  }, [userDetails, page])
+
+  useEffect(() => {
+    getChatHistory()
+
+  }, [page])
 
   return (
     <div className="container-fluid">
@@ -544,6 +556,8 @@ const Chat = () => {
           onDeleteSession={handleDeleteSession}
           onRenameSession={handleRename}
           showErrorToast={showErrorToast}
+          page={page}
+          setPage={setPage}
         />
 
         {/* Main Chat Window */}
