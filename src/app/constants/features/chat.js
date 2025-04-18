@@ -41,7 +41,6 @@ const chatSlice = createSlice({
             state.chatCountToday += 1;
         },
         setChatHistory: (state, action) => {
-            console.log("Setting chat history:", action.payload);
             state.chatHistory = action.payload;
         },
         addChatHistory: (state, action) => {
@@ -50,9 +49,7 @@ const chatSlice = createSlice({
         renameSession: (state, action) => {
             const { sessionId, newName } = action.payload;
             const sessionIndex = state.chatHistory.findIndex(session => session._id === sessionId);
-            if (sessionIndex !== -1) {
-                state.chatHistory[sessionIndex].name = newName;
-            }
+            state.chatHistory[sessionIndex].title = newName;
         },
         moveSessionToTop: (state) => {
             const sessionId = state.selectedSessionId;
@@ -61,15 +58,19 @@ const chatSlice = createSlice({
                 return;
             }
 
-            const index = state.chatHistory.findIndex(session =>{
-                 session._id === sessionId
-                });
+            const index = state.chatHistory.findIndex(session => {
+                session._id === sessionId
+            });
 
             // if (index !== -1) {
-                const [session] = state.chatHistory.splice(index, 1);
-                state.chatHistory.unshift(session);
+            const [session] = state.chatHistory.splice(index, 1);
+            state.chatHistory.unshift(session);
             // }
-        },        
+        },
+        removeSession: (state, action) => {
+            const sessionId = action.payload;
+            state.chatHistory = state.chatHistory.filter(session => session._id !== sessionId);
+        },
     },
 })
 
@@ -85,6 +86,7 @@ export const {
     setChatHistory,
     addChatHistory,
     renameSession,
-    moveSessionToTop
+    moveSessionToTop,
+    removeSession,
 } = chatSlice.actions;
 export default chatSlice.reducer;

@@ -1,4 +1,4 @@
-import React, { use, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FiMenu } from 'react-icons/fi';
 import styles from './Chat.module.css';
 import ChatSidebar from './ChatSidebar';
@@ -8,6 +8,7 @@ import ChatInput from './ChatInput';
 import Link from 'next/link';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import axios from 'axios';
+import { Toast } from 'bootstrap';
 import aiferAxios from '../../constants/axios'
 import { useParams, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
@@ -17,6 +18,8 @@ import {
   clearMessages,
   incrementChatCountToday,
   moveSessionToTop,
+  removeSession,
+  renameSession,
   setChatCountToday,
   setChatHistory,
   setCurrentMode,
@@ -39,6 +42,8 @@ const Chat = () => {
   const [showPopularQuestions, setShowPopularQuestions] = useState(false)
   const [lastQuery, setLastQuery] = useState("")
   const [popularQuestions, setPopularQuestions] = useState([])
+  const [error, setError] = useState("")
+  const [successMessage, setSuccessMessage] = useState("")
   const messages = useSelector((state) => state.chat.messages);
   const { currentMode, chatCountToday, chatHistory } = useSelector((state) => state.chat);
 
@@ -51,8 +56,10 @@ const Chat = () => {
 
   const handleSend = (e) => {
     e.preventDefault()
+
     if (chatCountToday >= 5) {
-      alert("You have reached the limit of 5 queries today. Please upgrade to premium for unlimited access.") // REPLACE WITH TOAST MESSAGE
+      setError("You have reached the maximum number of chats for today. Please try again tomorrow.")
+      showErrorToast()
       return
     }
     onSubmitNewMessage()
@@ -226,13 +233,19 @@ const Chat = () => {
 
       const { data } = await aiferAxios.post("/api/emo/createChat", body)
 
+      if (!data.success) {
+        setError("Error creating new session")
+        showErrorToast()
+        return
+      }
       router.push(`/chat/${data.data._id}`)
       dispatch(setSelectedSessionId(data.data._id))
       dispatch(addChatHistory(data.data))
 
       return data.data._id;
     } catch (error) {
-      console.log(error, "error in creating new session");
+      setError("Error creating new session")
+      showErrorToast()
     }
   }
 
@@ -242,7 +255,7 @@ const Chat = () => {
 
       if (messages.length < 2) {
         return;
-      } else if (messages.length === 2 && !chatid) {
+      } else if (messages.length === 2 || !selectedSessionId) {
         sessionId = await createNewSession()
       }
 
@@ -392,9 +405,13 @@ const Chat = () => {
           })
 
         })
+      } else {
+        setError("Error fetching messages")
+        showErrorToast()
       }
     } catch (error) {
-      console.log(error);
+      setError("Error fetching messages")
+      showErrorToast()
     }
   }
 
@@ -435,6 +452,59 @@ const Chat = () => {
     router.push(`/chat/${id}`)
   }
 
+  const handleDeleteSession = async (id) => {
+    try {
+      const { data } = await aiferAxios.delete(`/api/emo/deleteChat/${id}`)
+
+      if (data.success) {
+        setSuccessMessage("Session deleted successfully")
+        showSuccessToast()
+        if (id === selectedSessionId) {
+          dispatch(clearMessages())
+          dispatch(setSelectedSessionId(null))
+          router.push("/chat")
+        }
+        dispatch(removeSession(id))
+      } else {
+        setError("Error deleting session")
+        showErrorToast()
+      }
+    } catch (error) {
+      setError("Error deleting session")
+      showErrorToast()
+    }
+  }
+
+  const showErrorToast = () => {
+    const toastEl = document.getElementById('errorToast');
+    const toast = new Toast(toastEl);
+    toast.show();
+  };
+
+  const showSuccessToast = () => {
+    const toastEl = document.getElementById('successToast');
+    const toast = new Toast(toastEl);
+    toast.show();
+  };
+
+  const handleRename = async (id, newName) => {
+    try {
+      const { data } = await aiferAxios.patch(`/api/emo/renameChat`, { chatId: id, newTitle: newName })
+
+      if (data.success) {
+        setSuccessMessage("Session renamed successfully")
+        showSuccessToast()
+        dispatch(renameSession({ sessionId: id, newName }))
+      } else {
+        setError("Error renaming session")
+        showErrorToast()
+      }
+    } catch (error) {
+      setError("Error renaming session")
+      showErrorToast()
+    }
+  }
+
   useEffect(() => {
     setShowPopularQuestions(false)
   }, [currentMode])
@@ -471,6 +541,9 @@ const Chat = () => {
           toggleSidebar={toggleSidebar}
           onNewChat={handleNewChat}
           handleSelectSession={handleSelectSession}
+          onDeleteSession={handleDeleteSession}
+          onRenameSession={handleRename}
+          showErrorToast={showErrorToast}
         />
 
         {/* Main Chat Window */}
@@ -523,6 +596,58 @@ const Chat = () => {
           </div>
         </div>
       </div>
+
+      {/* Toast for success messages */}
+      <div
+        className="toast-container position-fixed bottom-0 end-0 p-3"
+        style={{ zIndex: 9999 }}
+      >
+        <div
+          className="toast align-items-center text-bg-success border-0"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+          id="successToast"
+        >
+          <div className="d-flex">
+            <div className="toast-body">
+              {successMessage}
+            </div>
+            <button
+              type="button"
+              className="btn-close btn-close-white me-2 m-auto"
+              data-bs-dismiss="toast"
+              aria-label="Close"
+            ></button>
+          </div>
+        </div>
+      </div>
+      {/* Toast for error messages */}
+      <div
+        className="toast-container position-fixed bottom-0 end-0 p-3"
+        style={{ zIndex: 9999 }}
+      >
+        <div
+          className="toast align-items-center text-bg-success border-0"
+          role="alert"
+          aria-live="assertive"
+          aria-atomic="true"
+          id="errorToast"
+        >
+          <div className="d-flex">
+            <div className="toast-body">
+              {error}
+            </div>
+            <button
+              type="button"
+              className="btn-close btn-close-white me-2 m-auto"
+              data-bs-dismiss="toast"
+              aria-label="Close"
+            ></button>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 };

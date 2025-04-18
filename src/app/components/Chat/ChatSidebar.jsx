@@ -4,10 +4,23 @@ import { IoClose, IoSearchSharp } from "react-icons/io5";
 import { SiBookstack } from "react-icons/si";
 import { BiDotsHorizontalRounded } from "react-icons/bi";
 import Link from 'next/link';
+import { useSelector } from 'react-redux';
 
-const ChatSidebar = ({ isSidebarOpen, history, toggleSidebar, onNewChat, handleSelectSession }) => {
+const ChatSidebar = ({
+    isSidebarOpen,
+    history,
+    toggleSidebar,
+    onNewChat,
+    handleSelectSession,
+    onDeleteSession,
+    onRenameSession,
+}) => {
     const [openChatOptions, setOpenChatOptions] = useState(null);
     const [userDropdownOpen, setUserDropdownOpen] = useState(false);
+    const [editingChatId, setEditingChatId] = useState(null);
+    const [newChatTitle, setNewChatTitle] = useState('');
+
+    const selectedSessionId = useSelector((state) => state.chat.selectedSessionId);
 
     const toggleChatOptions = (chatId) => {
         setOpenChatOptions(openChatOptions === chatId ? null : chatId);
@@ -63,9 +76,41 @@ const ChatSidebar = ({ isSidebarOpen, history, toggleSidebar, onNewChat, handleS
                         <div
                             onClick={() => handleSelectSession(chat._id)}
                             key={index}
-                            className={`${styles.chatHistoryItem} d-flex justify-content-between`}
+                            className={`${styles.chatHistoryItem} ${chat._id === selectedSessionId && styles.SelectedItem} d-flex justify-content-between`}
                         >
-                            <span>{chat.mode === "search" ? <IoSearchSharp /> : <SiBookstack />} {chat.title}</span>
+                            <span>
+                                {editingChatId === chat._id ? (
+                                    <input
+                                        type="text"
+                                        value={newChatTitle}
+                                        onChange={(e) => setNewChatTitle(e.target.value)}
+                                        onClick={(e) => e.stopPropagation()}
+                                        onBlur={() => {
+                                            if (newChatTitle.trim()) {
+                                                onRenameSession(chat._id, newChatTitle.trim());
+                                            }
+                                            setEditingChatId(null);
+                                            setNewChatTitle('');
+                                        }}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                if (newChatTitle.trim()) {
+                                                    onRenameSession(chat._id, newChatTitle.trim());
+                                                }
+                                                setEditingChatId(null);
+                                                setNewChatTitle('');
+                                            }
+                                        }}
+                                        autoFocus
+                                        className={styles.renameInput}
+                                    />
+                                ) : (
+                                    <>
+                                        {chat.mode === "search" ? <IoSearchSharp /> : <SiBookstack />} {chat.title}
+                                    </>
+                                )}
+                            </span>
+
 
                             <div className={`${styles.right} position-relative`}>
                                 <button
@@ -77,8 +122,14 @@ const ChatSidebar = ({ isSidebarOpen, history, toggleSidebar, onNewChat, handleS
                                 ><BiDotsHorizontalRounded size={20} /></button>
                                 {openChatOptions === chat._id && (
                                     <div className={styles.optionsMenu}>
-                                        <button onClick={() => console.log("Rename", chat._id)}>Rename</button>
-                                        <button onClick={() => console.log("Delete", chat._id)}>Delete</button>
+                                        <button onClick={(e) => {
+                                            e.stopPropagation();
+                                            setEditingChatId(chat._id);
+                                            setNewChatTitle(chat.title);
+                                            setOpenChatOptions(null);
+                                        }}>Rename</button>
+
+                                        <button onClick={() => onDeleteSession(chat._id)}>Delete</button>
                                     </div>
                                 )}
                             </div>
