@@ -33,7 +33,7 @@ const ChatMessages = ({
     const html = `
       <p><strong>Question:</strong> ${question}</p>
       <p><strong>Options:</strong></p>
-      <ol>${options}</ol>
+      <ol style="list-style: none;">${options}</ol>
       <p><strong>Answer:</strong> (${answer})</p>
       <p><strong>Explanation:</strong> ${explanation}</p>
     `;

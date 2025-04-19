@@ -400,6 +400,7 @@ const Chat = () => {
       const { data } = await aiferAxios.get(`/api/emo/session/${sessionId}`, {
         headers: {
           authorization: process.env.NEXT_PUBLIC_EMO_DEVELOPER_API_KEY,
+          userId: userDetails.firebase_uid,
         },
       })
 
@@ -410,8 +411,11 @@ const Chat = () => {
           dispatch(setCurrentMode("search"))
         }
         dispatch(setSelectedSession(data.data))
+
+      fetchMessages(data.data._id)
       } else {
-        router.push("/chat")
+        setError(data.message || "Error fetching session")
+        showErrorToast()
       }
     } catch (error) {
       console.log(error);
@@ -579,14 +583,11 @@ const Chat = () => {
   }, [currentMode])
 
   useEffect(() => {
-    if (chatid) {
+    if (chatid && userDetails.firebase_uid) {
       dispatch(setSelectedSessionId(chatid))
       getSession(chatid)
     }
-    if (chatid && messages.length === 0) {
-      fetchMessages(chatid)
-    }
-  }, [chatid])
+  }, [chatid, userDetails])
 
   useEffect(() => {
     if (userDetails && !userDetails.premium) {
