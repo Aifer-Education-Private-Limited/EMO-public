@@ -8,7 +8,7 @@ import ChatInput from './ChatInput';
 import Link from 'next/link';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 import axios from 'axios';
-import { Toast } from 'bootstrap';
+// import { Toast } from 'bootstrap';
 import aiferAxios from '../../constants/axios'
 import { useParams, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
@@ -28,6 +28,7 @@ import {
   setTotalChatCount,
   updateLastAssistantMessage
 } from '@/app/constants/features/chat';
+import keyword_extractor from 'keyword-extractor';
 
 const Chat = () => {
   const dispatch = useDispatch()
@@ -47,7 +48,8 @@ const Chat = () => {
   const [error, setError] = useState("")
   const [successMessage, setSuccessMessage] = useState("")
   const messages = useSelector((state) => state.chat.messages);
-  const { currentMode, chatCountToday, chatHistory } = useSelector((state) => state.chat);
+  const { currentMode, totalChatCounts, chatHistory } = useSelector((state) => state.chat);
+  const [toasts, setToasts] = useState({ errorToast: null, successToast: null });
 
   const router = useRouter()
 
@@ -59,7 +61,11 @@ const Chat = () => {
   const handleSend = (e) => {
     e.preventDefault()
 
-    if (chatCountToday >= 5) {
+    if (currentMode === "pyq" && totalChatCounts.pyq >= 5) {
+      setError("You have reached the maximum number of chats for today. Please try again tomorrow.")
+      showErrorToast()
+      return
+    } else if (currentMode === "search" && totalChatCounts.search >= 5) {
       setError("You have reached the maximum number of chats for today. Please try again tomorrow.")
       showErrorToast()
       return
@@ -225,13 +231,19 @@ const Chat = () => {
     setResponseLoading(false)
   }
 
-  const createNewSession = async () => {
-    const body = {
-      userId: userDetails.firebase_uid,
-      mode: currentMode,
-      title: "New chat",
-    }
+  const createNewSession = async (messages) => {
     try {
+      const title = getTitleFromMessages(messages);
+
+      const body = {
+        userId: userDetails.firebase_uid,
+        mode: currentMode,
+        title: title || new Date().toLocaleString("en-US", {
+          month: "long",
+          day: "2-digit",
+          year: "2-digit",
+        }),
+      }
 
       const { data } = await aiferAxios.post("/api/emo/createChat", body)
 
@@ -258,7 +270,7 @@ const Chat = () => {
       if (messages.length < 2) {
         return;
       } else if (messages.length === 2 || !selectedSessionId) {
-        sessionId = await createNewSession()
+        sessionId = await createNewSession(messages)
       }
 
       const lastTwoMessages = messages.slice(-2);
@@ -280,7 +292,7 @@ const Chat = () => {
       }
 
     } catch (error) {
-      console.error("❌ Failed to save messages", error);
+      console.error("Failed to save messages", error);
     }
   };
 
@@ -422,7 +434,7 @@ const Chat = () => {
       const { data } = await aiferAxios.get(`/api/emo/conversationsCountToday/${userDetails.firebase_uid}`)
 
       if (data.success) {
-        dispatch(setChatCountToday(data.count))
+        dispatch(setChatCountToday(data.counts))
       }
     } catch (error) {
       console.log(error);
@@ -482,16 +494,28 @@ const Chat = () => {
     }
   }
 
+  useEffect(() => {
+    // Only run on client
+    if (typeof window !== 'undefined') {
+      const bootstrap = require('bootstrap'); // lazy-load bootstrap only on client
+      const errorEl = document.getElementById('errorToast');
+      const successEl = document.getElementById('successToast');
+
+      if (errorEl && successEl) {
+        setToasts({
+          errorToast: new bootstrap.Toast(errorEl),
+          successToast: new bootstrap.Toast(successEl),
+        });
+      }
+    }
+  }, []);
+
   const showErrorToast = () => {
-    const toastEl = document.getElementById('errorToast');
-    const toast = new Toast(toastEl);
-    toast.show();
+    toasts.errorToast?.show();
   };
 
   const showSuccessToast = () => {
-    const toastEl = document.getElementById('successToast');
-    const toast = new Toast(toastEl);
-    toast.show();
+    toasts.successToast?.show();
   };
 
   const handleRename = async (id, newName) => {
@@ -542,6 +566,17 @@ const Chat = () => {
     getChatHistory()
 
   }, [page])
+
+  const getTitleFromMessages = (messages) => {
+    const text = messages.map(msg => msg.content).join(" ");
+    const keywords = keyword_extractor.extract(text, {
+      language: "english",
+      remove_digits: true,
+      return_changed_case: true,
+      remove_duplicates: true,
+    });
+    return keywords.slice(0, 3).join(' ');
+  }
 
   return (
     <div className="container-fluid">
@@ -617,7 +652,8 @@ const Chat = () => {
         style={{ zIndex: 9999 }}
       >
         <div
-          className="toast align-items-center text-bg-success border-0"
+          style={{ background: "#5cc478", color: "white" }}
+          className="toast align-items-center border-0"
           role="alert"
           aria-live="assertive"
           aria-atomic="true"
@@ -629,7 +665,7 @@ const Chat = () => {
             </div>
             <button
               type="button"
-              className="btn-close btn-close-white me-2 m-auto"
+              className="btn-close btn-close-white me-2 m-auto fw-semibold"
               data-bs-dismiss="toast"
               aria-label="Close"
             ></button>
@@ -642,7 +678,7 @@ const Chat = () => {
         style={{ zIndex: 9999 }}
       >
         <div
-          className="toast align-items-center text-bg-success border-0"
+          className="toast align-items-center text-bg-danger border-0"
           role="alert"
           aria-live="assertive"
           aria-atomic="true"

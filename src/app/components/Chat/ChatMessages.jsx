@@ -107,7 +107,7 @@ const ChatMessages = ({
                 // ref={(el) => messageRefs.current[index] = el}
                 >
                 </div>
-                {message.role === 'assistant-remote' && (
+                {/* {message.role === 'assistant-remote' && (
                   <div className={styles.responseOptions}>
                     {responseLoading === false &&
                       index === messages.length - 1 &&
@@ -116,11 +116,8 @@ const ChatMessages = ({
                       >
                         <LuRefreshCcw size={17} />
                       </button>}
-                    {/* <button onClick={() => copyToClipboard(index)}>
-                      {copySuccess[index] ? <FaCheck /> : <LuCopy size={17} />}
-                    </button> */}
                   </div>
-                )}
+                )} */}
               </div>
             )) :
             <div className='text-center mt-5'>

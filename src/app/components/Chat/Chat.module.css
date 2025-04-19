@@ -19,6 +19,15 @@
   letter-spacing: 0.5px;
 }
 
+.chatTitle {
+  display: inline-block;
+  max-width: 200px; /* Adjust based on your layout */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
 .closeButton {
   border: none;
   padding: 0;
@@ -191,12 +200,22 @@
   cursor: pointer;
   transition: all 0.2s ease;
   font-weight: 500;
+  position: relative;
 }
 
-.chatHistoryItem .right .optionsBtn{
+.chatHistoryItem .right {
+  position: relative;
+}
+
+.chatHistoryItem .right .optionsBtn {
   display: none;
   border: none;
   background-color: transparent;
+  position: absolute;
+  right: 0; /* Adjust based on your layout */
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10; /* Ensures it's above everything else */
 }
 
 .chatHistoryItem:hover {
@@ -227,7 +246,7 @@
   border-radius: 6px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   width: 120px;
-  z-index: 10;
+  z-index: 100;
 }
 
 .optionsMenu button {

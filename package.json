@@ -15,6 +15,7 @@
     "bootstrap": "^5.3.5",
     "firebase": "^11.4.0",
     "jsonwebtoken": "^9.0.2",
+    "keyword-extractor": "^0.0.28",
     "marked": "^15.0.7",
     "next": "15.2.3",
     "react": "^19.0.0",

@@ -6,7 +6,6 @@ import { BiDotsHorizontalRounded } from "react-icons/bi";
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
 
-// ✅ Utility to check if date is today
 const isToday = (dateStr) => {
     const date = new Date(dateStr);
     const today = new Date();
@@ -34,6 +33,7 @@ const ChatSidebar = ({
     const [newChatTitle, setNewChatTitle] = useState('');
     const historyContainerRef = useRef(null);
     const { totalChatCount } = useSelector((state) => state.chat);
+    const optionsRef = useRef(null);
 
     const isFetchingRef = useRef(false);
     const selectedSessionId = useSelector((state) => state.chat.selectedSessionId);
@@ -70,6 +70,25 @@ const ChatSidebar = ({
 
     const todayChats = history.filter(chat => isToday(chat.updatedAt));
     const otherChats = history.filter(chat => !isToday(chat.updatedAt));
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                optionsRef.current &&
+                !optionsRef.current.contains(event.target)
+            ) {
+                setOpenChatOptions(null);
+            }
+        };
+    
+        if (openChatOptions) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+    
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [openChatOptions]);    
 
     const renderChatItem = (chat) => (
         <div
@@ -119,7 +138,7 @@ const ChatSidebar = ({
                     <BiDotsHorizontalRounded size={20} />
                 </button>
                 {openChatOptions === chat._id && (
-                    <div className={styles.optionsMenu}>
+                    <div className={styles.optionsMenu} ref={optionsRef}>
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
