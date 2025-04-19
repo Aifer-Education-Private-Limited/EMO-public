@@ -245,7 +245,11 @@ const Chat = () => {
         }),
       }
 
-      const { data } = await aiferAxios.post("/api/emo/createChat", body)
+      const { data } = await aiferAxios.post("/api/emo/createChat", body, {
+        headers: {
+          authorization: process.env.NEXT_PUBLIC_EMO_DEVELOPER_API_KEY,
+        },
+      })
 
       if (!data.success) {
         setError("Error creating new session")
@@ -283,7 +287,11 @@ const Chat = () => {
         conversation: conversation,
       };
 
-      await aiferAxios.post(`/api/emo/saveMessages/${sessionId}`, body);
+      await aiferAxios.post(`/api/emo/saveMessages/${sessionId}`, body, {
+        headers: {
+          authorization: process.env.NEXT_PUBLIC_EMO_DEVELOPER_API_KEY,
+        },
+      });
 
       dispatch(moveSessionToTop())
 
@@ -301,7 +309,11 @@ const Chat = () => {
     setLastQuery(query)
     setResponseError("")
     try {
-      const { data } = await axios.post("https://vector.mymeet.link/api/v1/vector/aifer/search", { query })
+      const { data } = await axios.post("https://vector.mymeet.link/api/v1/vector/aifer/search", { query }, {
+        headers: {
+          authorization: process.env.NEXT_PUBLIC_EMO_DEVELOPER_API_KEY,
+        },
+      })
 
       if (!data.most_similar_text || data.most_similar_text.length === 0) {
         setResponseError("No results found");
@@ -385,7 +397,11 @@ const Chat = () => {
 
   const getSession = async (sessionId) => {
     try {
-      const { data } = await aiferAxios.get(`/api/emo/session/${sessionId}`)
+      const { data } = await aiferAxios.get(`/api/emo/session/${sessionId}`, {
+        headers: {
+          authorization: process.env.NEXT_PUBLIC_EMO_DEVELOPER_API_KEY,
+        },
+      })
 
       if (data.success) {
         if (data.data.mode === "pyq") {
@@ -404,7 +420,11 @@ const Chat = () => {
 
   const fetchMessages = async (id) => {
     try {
-      const { data } = await aiferAxios.get(`/api/emo/chat/${id}`)
+      const { data } = await aiferAxios.get(`/api/emo/chat/${id}`, {
+        headers: {
+          authorization: process.env.NEXT_PUBLIC_EMO_DEVELOPER_API_KEY,
+        },
+      })
 
       if (data.success) {
         dispatch(clearMessages())
@@ -431,7 +451,11 @@ const Chat = () => {
 
   const getChatCountToday = async () => {
     try {
-      const { data } = await aiferAxios.get(`/api/emo/conversationsCountToday/${userDetails.firebase_uid}`)
+      const { data } = await aiferAxios.get(`/api/emo/conversationsCountToday/${userDetails.firebase_uid}`, {
+        headers: {
+          authorization: process.env.NEXT_PUBLIC_EMO_DEVELOPER_API_KEY,
+        },
+      })
 
       if (data.success) {
         dispatch(setChatCountToday(data.counts))
@@ -443,12 +467,18 @@ const Chat = () => {
 
   const getChatHistory = async () => {
     try {
-      const { data } = await aiferAxios.get(`/api/emo/chatHistory/${userDetails.firebase_uid}`, {
-        params: {
-          limit: 15,
-          page,
-        },
-      });
+      const { data } = await aiferAxios.get(
+        `/api/emo/chatHistory/${userDetails.firebase_uid}`,
+        {
+          params: {
+            limit: 15,
+            page,
+          },
+          headers: {
+            authorization: process.env.NEXT_PUBLIC_EMO_DEVELOPER_API_KEY,
+          },
+        }
+      );
 
       if (data.success) {
         if (page === 1) {
@@ -473,7 +503,11 @@ const Chat = () => {
 
   const handleDeleteSession = async (id) => {
     try {
-      const { data } = await aiferAxios.delete(`/api/emo/deleteChat/${id}`)
+      const { data } = await aiferAxios.delete(`/api/emo/deleteChat/${id}`, {
+        headers: {
+          authorization: process.env.NEXT_PUBLIC_EMO_DEVELOPER_API_KEY,
+        },
+      })
 
       if (data.success) {
         setSuccessMessage("Session deleted successfully")
@@ -520,7 +554,11 @@ const Chat = () => {
 
   const handleRename = async (id, newName) => {
     try {
-      const { data } = await aiferAxios.patch(`/api/emo/renameChat`, { chatId: id, newTitle: newName })
+      const { data } = await aiferAxios.patch(`/api/emo/renameChat`, { chatId: id, newTitle: newName }, {
+        headers: {
+          authorization: process.env.NEXT_PUBLIC_EMO_DEVELOPER_API_KEY,
+        },
+      })
 
       if (data.success) {
         setSuccessMessage("Session renamed successfully")
