@@ -2,7 +2,9 @@ import React, { useEffect, useRef, useState } from 'react';
 import styles from './Chat.module.css';
 import { marked } from 'marked';
 import { LuRefreshCcw } from 'react-icons/lu'
+import { SiRobotframework } from "react-icons/si";
 import { useSelector } from 'react-redux';
+import { FaPen } from 'react-icons/fa6';
 
 const ChatMessages = ({
   currentMode,
@@ -13,6 +15,7 @@ const ChatMessages = ({
   regenrateResponse,
   onselectQuestion,
   showPopularQuestions,
+  handleClickEditQuery
 }) => {
   const messages = useSelector((state) => state.chat.messages);
 
@@ -160,9 +163,12 @@ const ChatMessages = ({
             {/* Popular Questions (shown after messages) */}
             {showPopularQuestions && (
               <div className={styles.popularQuestions}>
-                <h5 className="mb-4 fw-bold text-center">
-                  <strong>{messages[0].content}</strong> - Popular Questions
-                </h5>
+                <div className='text-center mb-4'>
+                  <h5 className="fw-bold text-center">
+                    <strong>{messages[messages.length-1].content}</strong> - Popular Questions
+                  </h5>
+                  {!responseLoading && popularQuestions.parsed && <p>Please select a question to see answer</p>}
+                </div>
                 <div className="row g-3">
                   {responseLoading ? (
                     Array(4).fill(0).map((_, i) => (
@@ -175,7 +181,28 @@ const ChatMessages = ({
                         </div>
                       </div>
                     ))
-                  ) : !responseError ? (
+                  ) : responseError ? (
+                    <div className={styles.errorResponse}>
+                      <p className='m-0 ms-md-4'>
+                        {responseError}.{' '}
+                        <span
+                          onClick={regenrateResponse}
+                          style={{ cursor: 'pointer' }}
+                          className='fw-semibold'
+                        >
+                          Please try again
+                        </span>
+                      </p>
+                    </div>
+                  ) : !popularQuestions[0].parsed ? (
+                    <div className="text-center">
+                      <h5 className="text-danger"><SiRobotframework /> Sorry, we couldn't find any questions. <br /> Try with another question.</h5>
+                      <span
+                        style={{ cursor: "pointer", fontWeight: "500" }}
+                        onClick={handleClickEditQuery}
+                        className='border-bottom border-dark'><FaPen /> Edit question</span>
+                    </div>
+                  ) : (
                     popularQuestions.map((question) => (
                       <div
                         onClick={() => onselectQuestion(question.description)}
@@ -193,32 +220,19 @@ const ChatMessages = ({
                                 ))}
                             </ol>
                             <style>{`
-                        .pyq-options {
-                          list-style-type: lower-alpha;
-                        }
-                        .pyq-options li::marker {
-                          content: counter(list-item) ") ";
-                        }
-                      `}</style>
+                                .pyq-options {
+                                  list-style-type: lower-alpha;
+                                }
+                                .pyq-options li::marker {
+                                  content: counter(list-item) ") ";
+                                }
+                              `}</style>
                           </div>
                         </div>
                       </div>
-                    ))
-                  ) : (
-                    <div className={styles.errorResponse}>
-                      <p className='m-0 ms-md-4'>
-                        {responseError}.{' '}
-                        <span
-                          onClick={regenrateResponse}
-                          style={{ cursor: 'pointer' }}
-                          className='fw-semibold'
-                        >
-                          Please try again
-                        </span>
-                      </p>
-                    </div>
-                  )}
+                    )))}
                 </div>
+                {!responseLoading && popularQuestions.parsed && <p className='text-center my-4'>Please select a question to see the answer</p>}
               </div>
             )}
           </>

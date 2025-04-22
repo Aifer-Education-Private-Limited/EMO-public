@@ -16,6 +16,7 @@ import {
   addChatHistory,
   addMessage,
   clearMessages,
+  editMessage,
   incrementChatCountToday,
   moveSessionToTop,
   removeSession,
@@ -26,7 +27,6 @@ import {
   setCurrentMode,
   setSelectedSession,
   setSelectedSessionId,
-  setTotalChatCount,
   updateLastAssistantMessage
 } from '@/app/constants/features/chat';
 import keyword_extractor from 'keyword-extractor';
@@ -37,6 +37,7 @@ const Chat = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
+  const [isEditQuery, setIsEditQuery] = useState(false)
   const { chatid } = useParams()
   const selectedSessionId = useSelector((state) => state.chat.selectedSessionId);
 
@@ -51,6 +52,7 @@ const Chat = () => {
   const messages = useSelector((state) => state.chat.messages);
   const { currentMode, totalChatCount, chatHistory } = useSelector((state) => state.chat);
   const [toasts, setToasts] = useState({ errorToast: null, successToast: null });
+  const searchInputRef = useRef(null);
   // const [isRegenerating, setIsRegenerating] = useState(false)
 
   const router = useRouter()
@@ -60,7 +62,7 @@ const Chat = () => {
   let codeBlockTracker;
   let newLineTracker;
 
-  const handleSend = (e) => {
+  const handleSend = async (e) => {
     e.preventDefault()
 
     if (currentMode === "pyq" && totalChatCount.pyq >= 5) {
@@ -72,7 +74,13 @@ const Chat = () => {
       showErrorToast()
       return
     }
+    if (isEditQuery) {
+      const position = messages.length - 1;
+      const newMessage = searchQuery;
+      await dispatch(editMessage({ position, newMessage }))
+    }
     onSubmitNewMessage()
+    setIsEditQuery(false)
   };
 
   const onSubmitNewMessage = async () => {
@@ -93,7 +101,7 @@ const Chat = () => {
       setShowPopularQuestions(true)
       setSearchQuery("");
       const question = { content: searchQuery, role: "user" };
-      dispatch(addMessage(question));
+      if (!isEditQuery) dispatch(addMessage(question));
       fetchPyqData(searchQuery)
     } else {
       console.log("else");
@@ -107,7 +115,7 @@ const Chat = () => {
 
     // console.log(isRegenerating ? "true" : "false");
     // console.log(messages);
-    
+
 
     if (!isRegenerating) {
       dispatch(addMessage(question));
@@ -315,15 +323,11 @@ const Chat = () => {
   };
 
 
-  const fetchPyqData = async (query) => {
+  const fetchPyqData = async (query) => {    
     setLastQuery(query)
     setResponseError("")
     try {
-      const { data } = await axios.post("https://vector.mymeet.link/api/v1/vector/aifer/search", { query }, {
-        headers: {
-          authorization: process.env.NEXT_PUBLIC_EMO_DEVELOPER_API_KEY,
-        },
-      })
+      const { data } = await axios.post("https://vector.mymeet.link/api/v1/vector/aifer/search", { query })
 
       if (!data.most_similar_text || data.most_similar_text.length === 0) {
         setResponseError("No results found");
@@ -331,7 +335,9 @@ const Chat = () => {
         return;
       }
 
-      setPopularQuestions(formattedPyqData(data))
+      const formatted = formattedPyqData(data)
+      
+      setPopularQuestions(formatted)
       setResponseLoading(false)
 
     } catch (error) {
@@ -353,6 +359,8 @@ const Chat = () => {
         const answerMatch = originalDescription.match(/answer\s*:\s*([a-d])/i);
         const explanationMatch = originalDescription.match(/explanation\s*:\s*(.*)/is);
 
+        if (!questionMatch) return { ...item };
+
         const formattedData = {
           question: questionMatch ? questionMatch[1].trim() : '',
           options: optionsMatch.map(match => ({ key: match[1], value: match[2].trim() })),
@@ -367,6 +375,14 @@ const Chat = () => {
       });
   }
 
+  const handleClickEditQuery = () => {
+    setSearchQuery(messages[messages.length - 1].content);
+    setShowPopularQuestions(false)
+    setIsEditQuery(true)
+    setTimeout(() => {
+      searchInputRef.current?.focus();
+    }, 100);
+  }
 
   const handleNewChat = () => {
     dispatch(clearMessages())
@@ -426,7 +442,7 @@ const Chat = () => {
         }
         dispatch(setSelectedSession(data.data))
 
-      fetchMessages(data.data._id)
+        fetchMessages(data.data._id)
       } else {
         setError(data.message || "Error fetching session")
         showErrorToast()
@@ -574,7 +590,7 @@ const Chat = () => {
 
   const handleRename = async (id, newName) => {
     try {
-      if(!newName){
+      if (!newName) {
         setError("Name cannot be empty")
         showErrorToast()
         return
@@ -691,6 +707,7 @@ const Chat = () => {
               responseError={responseError}
               formattedPyqData={formattedPyqData}
               showPopularQuestions={showPopularQuestions}
+              handleClickEditQuery={handleClickEditQuery}
             />
 
             {/* Input Area */}
@@ -701,6 +718,7 @@ const Chat = () => {
               sendMessage={handleSend}
               responseLoading={responseLoading}
               showPyq={showPopularQuestions}
+              searchInputRef={searchInputRef}
             />
 
           </div>

@@ -1,4 +1,12 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+
+export const editMessage = createAsyncThunk(
+    'chat/editMessage',
+    async ({ position, newMessage }) => {
+        await new Promise((resolve) => setTimeout(resolve, 100));
+        return { position, newMessage };
+    }
+);
 
 const initialState = {
     messages: [],
@@ -82,7 +90,21 @@ const chatSlice = createSlice({
         },
         setChatHistoryCount: (state, action) => {
             state.chatHistoryCount = action.payload;
-        }
+        },
+        // editMessage: (state, action) => {
+        //     const { position, newMessage } = action.payload
+        //     console.log(action.payload);
+
+        //     state.messages[position].content = newMessage;
+        // }
+    },
+    extraReducers: (builder) => {
+        builder.addCase(editMessage.fulfilled, (state, action) => {
+            const { position, newMessage } = action.payload;
+            if (state.messages[position]) {
+                state.messages[position].content = newMessage;
+            }
+        });
     },
 })
 
