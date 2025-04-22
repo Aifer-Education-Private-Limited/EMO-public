@@ -24,7 +24,6 @@ const ChatSidebar = ({
     handleSelectSession,
     onDeleteSession,
     onRenameSession,
-    page,
     setPage,
 }) => {
     const [openChatOptions, setOpenChatOptions] = useState(null);
@@ -32,14 +31,14 @@ const ChatSidebar = ({
     const [editingChatId, setEditingChatId] = useState(null);
     const [newChatTitle, setNewChatTitle] = useState('');
     const historyContainerRef = useRef(null);
-    const { totalChatCount } = useSelector((state) => state.chat);
+    const { chatHistoryCount } = useSelector((state) => state.chat);
     const optionsRef = useRef(null);
 
     const isFetchingRef = useRef(false);
     const selectedSessionId = useSelector((state) => state.chat.selectedSessionId);
 
     const handleScroll = () => {
-        if (totalChatCount <= history.length) return;
+        if (chatHistoryCount === history.length) return;
         const container = historyContainerRef.current;
         if (!container || isFetchingRef.current) return;
 
@@ -90,7 +89,7 @@ const ChatSidebar = ({
         };
     }, [openChatOptions]);    
 
-    const renderChatItem = (chat) => (
+    const renderChatItem = (chat, index) => (
         <div
             key={chat._id}
             onClick={() => handleSelectSession(chat._id)}
@@ -121,9 +120,9 @@ const ChatSidebar = ({
                         className={styles.renameInput}
                     />
                 ) : (
-                    <>
+                    <span className={styles.chatTitle}>
                         {chat.mode === "search" ? <IoSearchSharp /> : <SiBookstack />} {chat.title}
-                    </>
+                    </span>
                 )}
             </span>
 
@@ -138,7 +137,7 @@ const ChatSidebar = ({
                     <BiDotsHorizontalRounded size={20} />
                 </button>
                 {openChatOptions === chat._id && (
-                    <div className={styles.optionsMenu} ref={optionsRef}>
+                    <div className={`${index === history.length-1 ? styles.optionsMenuTop : styles.optionsMenu}`} ref={optionsRef}>
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -149,7 +148,10 @@ const ChatSidebar = ({
                         >
                             Rename
                         </button>
-                        <button onClick={() => onDeleteSession(chat._id)}>Delete</button>
+                        <button onClick={(e) =>{ 
+                            e.stopPropagation()
+                            onDeleteSession(chat._id)
+                            }}>Delete</button>
                     </div>
                 )}
             </div>
@@ -158,8 +160,8 @@ const ChatSidebar = ({
 
     return (
         <div
-            ref={historyContainerRef}
-            onScroll={handleScroll}
+            // ref={historyContainerRef}
+            // onScroll={handleScroll}  
             className={`col-md-3 col-lg-3 col-xl-2 px-0 ${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : ''}`}
         >
             <div className="p-3">
@@ -201,7 +203,7 @@ const ChatSidebar = ({
                 </button>
 
                 <div
-                    className={styles.chatHistory}
+                    className={`${styles.chatHistory} ${history.length > 3 && styles.overflowAuto}`}
                     onScroll={handleScroll}
                     ref={historyContainerRef}
                 >

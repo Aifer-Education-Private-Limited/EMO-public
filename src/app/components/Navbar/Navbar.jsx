@@ -84,9 +84,9 @@ export default function Navbar() {
 
           {/* MOBILE VIEW */}
           <div className="d-md-none d-flex gap-1 ms-auto align-items-center">
-              <a href="#pricing"><button
-                className={`${styles.freeTrialBtn}`}
-              >Start Free Trial</button></a>
+            <a href="#pricing"><button
+              className={`${styles.freeTrialBtn}`}
+            >Start Free Trial</button></a>
             {user && userDetails ? (
               <div className={styles.userDropdown}
                 ref={dropdownRef}
@@ -153,10 +153,16 @@ export default function Navbar() {
               <li className="nav-item">
                 <a
                   className={styles.navLink}
-                  style={{cursor: "pointer"}}
+                  style={{ cursor: "pointer" }}
                   data-bs-toggle="collapse"
                   data-bs-target="#navbarNav"
-                  onClick={() => router.push("/chat")}
+                  onClick={() => {
+                    if (!user) {
+                      setShowLogin(true)
+                    } else {
+                      router.push("/chat")
+                    }
+                  }}
                 >Chat</a>
               </li>
             </ul>
@@ -164,9 +170,9 @@ export default function Navbar() {
 
           {/* DESKTOP VIEW */}
           <div className="d-none d-md-flex">
-              <a href="#pricing"><button
-                className={`${styles.freeTrialBtn} me-1`}
-              >Start Free Trial</button></a>
+            <a href="#pricing"><button
+              className={`${styles.freeTrialBtn} me-1`}
+            >Start Free Trial</button></a>
             {user && userDetails ? (
               <div className={styles.userDropdown} ref={dropdownRef}>
                 <button className={styles.userBtn} onClick={toggleUserDropdown}>

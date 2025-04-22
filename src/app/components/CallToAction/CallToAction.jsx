@@ -9,11 +9,13 @@ const CallToAction = () => {
                 <p className="text-muted">
                     Join thousands of successful students who trust Emo for their exam preparation
                 </p>
-                <button
-                    style={{ fontSize: "1.1rem" }}
-                    className={`primary-btn px-4 py-3 ${styles.freeTrialBtn}`}
-                >Start Your Free Trial Today
-                </button>
+                <a href="#pricing">
+                    <button
+                        style={{ fontSize: "1.1rem" }}
+                        className={`primary-btn px-4 py-3 ${styles.freeTrialBtn}`}
+                    >Start Your Free Trial Today
+                    </button>
+                </a>
             </div>
         </section>
     )

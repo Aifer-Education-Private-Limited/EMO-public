@@ -42,7 +42,7 @@ const Pricing = () => {
   };
 
   const handleGetStarted = () => {    
-    if (!userDetails) {
+    if (!user) {
       setLoginToChat(true)
     } else {
       router.push("/chat")
@@ -50,7 +50,6 @@ const Pricing = () => {
   }
 
   const handleUpgrade = () => {
-    console.log(userDetails);
     if (!userDetails || !userDetails.firebase_uid) {
       setLogin(true)
     } else {
@@ -156,7 +155,10 @@ const Pricing = () => {
                   </div>
                   <ul className={styles.featureList}>
                     <li className={styles.featureItem}>
-                      <FaCircleCheck className={styles.featureIcon} /> 20 free searches
+                      <FaCircleCheck className={styles.featureIcon} /> 5 free searches
+                    </li>
+                    <li className={styles.featureItem}>
+                      <FaCircleCheck className={styles.featureIcon} /> 5 free PYQs
                     </li>
                     <li className={styles.featureItem}>
                       <FaCircleCheck className={styles.featureIcon} /> Basic study materials

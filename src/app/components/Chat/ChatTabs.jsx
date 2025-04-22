@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import styles from './Chat.module.css'
 import { useDispatch } from 'react-redux';
-import { clearMessages, setCurrentMode } from '@/app/constants/features/chat';
+import { clearMessages, setCurrentMode, setSelectedSessionId } from '@/app/constants/features/chat';
 import { useRouter } from 'next/navigation';
 
 const ChatTabs = ({ currentMode }) => {
@@ -13,6 +13,7 @@ const ChatTabs = ({ currentMode }) => {
   const changeCurrentMode = (mode) => {
     dispatch(setCurrentMode(mode));
     dispatch(clearMessages());
+    dispatch(setSelectedSessionId(null))
     router.push('/chat');
   }
 

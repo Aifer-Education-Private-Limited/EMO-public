@@ -6,8 +6,9 @@ const initialState = {
     selectedSession: null,
     currentMode: 'search',
     chatCountToday: 0,
+    chatHistoryCount: 0,
     chatHistory: [],
-    totalChatCounts: null,
+    totalChatCount: null,
 };
 
 const chatSlice = createSlice({
@@ -36,14 +37,14 @@ const chatSlice = createSlice({
             state.currentMode = action.payload;
         },
         setChatCountToday: (state, action) => {
-            state.totalChatCounts = action.payload;
+            state.totalChatCount = action.payload;
         },
         incrementChatCountToday: (state) => {
             const mode = state.currentMode;
-            if (!state.totalChatCounts[mode]) {
-                state.totalChatCounts[mode] = 0;
+            if (!state.totalChatCount[mode]) {
+                state.totalChatCount[mode] = 0;
             }
-            state.totalChatCounts[mode] += 1;
+            state.totalChatCount[mode] += 1;
         },
         setChatHistory: (state, action) => {
             state.chatHistory = action.payload;
@@ -79,6 +80,9 @@ const chatSlice = createSlice({
         setTotalChatCount: (state, action) => {
             state.totalChatCount = action.payload;
         },
+        setChatHistoryCount: (state, action) => {
+            state.chatHistoryCount = action.payload;
+        }
     },
 })
 
@@ -97,5 +101,6 @@ export const {
     moveSessionToTop,
     removeSession,
     setTotalChatCount,
+    setChatHistoryCount,
 } = chatSlice.actions;
 export default chatSlice.reducer;

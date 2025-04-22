@@ -22,6 +22,7 @@ import {
   renameSession,
   setChatCountToday,
   setChatHistory,
+  setChatHistoryCount,
   setCurrentMode,
   setSelectedSession,
   setSelectedSessionId,
@@ -48,8 +49,9 @@ const Chat = () => {
   const [error, setError] = useState("")
   const [successMessage, setSuccessMessage] = useState("")
   const messages = useSelector((state) => state.chat.messages);
-  const { currentMode, totalChatCounts, chatHistory } = useSelector((state) => state.chat);
+  const { currentMode, totalChatCount, chatHistory } = useSelector((state) => state.chat);
   const [toasts, setToasts] = useState({ errorToast: null, successToast: null });
+  // const [isRegenerating, setIsRegenerating] = useState(false)
 
   const router = useRouter()
 
@@ -61,11 +63,11 @@ const Chat = () => {
   const handleSend = (e) => {
     e.preventDefault()
 
-    if (currentMode === "pyq" && totalChatCounts.pyq >= 5) {
+    if (currentMode === "pyq" && totalChatCount.pyq >= 5) {
       setError("You have reached the maximum number of chats for today. Please try again tomorrow.")
       showErrorToast()
       return
-    } else if (currentMode === "search" && totalChatCounts.search >= 5) {
+    } else if (currentMode === "search" && totalChatCount.search >= 5) {
       setError("You have reached the maximum number of chats for today. Please try again tomorrow.")
       showErrorToast()
       return
@@ -98,12 +100,18 @@ const Chat = () => {
     }
   }
 
-  async function fetchData(userQuery, id, mode, prevChat) {
+  async function fetchData(userQuery, id, mode, prevChat, isRegenerating) {
     setResponseLoading(true)
     const question = { content: userQuery, role: "user" };
     const updatedChatList = [...(prevChat ?? messages), question];
 
-    dispatch(addMessage(question));
+    // console.log(isRegenerating ? "true" : "false");
+    // console.log(messages);
+    
+
+    if (!isRegenerating) {
+      dispatch(addMessage(question));
+    }
 
     const controller = new AbortController();
 
@@ -204,6 +212,8 @@ const Chat = () => {
           if (resultRef.current.length === event.data.length) {
             dispatch(addMessage(respondedChatItem));
           } else {
+            // console.log("else");
+            
             dispatch(updateLastAssistantMessage(resultRef.current));
           }
 
@@ -364,6 +374,7 @@ const Chat = () => {
   }
 
   const handleRegenerate = async () => {
+    // setIsRegenerating(true)
     if (currentMode === "pyq") {
       if (lastQuery) {
         fetchPyqData(lastQuery);
@@ -373,10 +384,13 @@ const Chat = () => {
       const prevChat = messages.slice(0, -1);
       const lastUserQuery = prevChat.pop();
 
+
+      // console.log(lastUserQuery);
       if (lastUserQuery.role !== "user") return;
+      // console.log("regenerating");
 
       setResponseLoading(true);
-      await fetchData(lastUserQuery.content, selectedSearchResponseId?.current ?? 0, currentMode, prevChat);
+      await fetchData(lastUserQuery.content, selectedSearchResponseId?.current ?? 0, currentMode, prevChat, true);
       setResponseLoading(false);
     }
   };
@@ -487,7 +501,7 @@ const Chat = () => {
       if (data.success) {
         if (page === 1) {
           dispatch(setChatHistory(data.data))
-          dispatch(setTotalChatCount(data.pagination.total))
+          dispatch(setChatHistoryCount(data.pagination.total))
         } else {
           dispatch(setChatHistory([...chatHistory, ...data.data]))
         }
@@ -519,7 +533,9 @@ const Chat = () => {
         if (id === selectedSessionId) {
           dispatch(clearMessages())
           dispatch(setSelectedSessionId(null))
-          router.push("/chat")
+          setTimeout(() => {
+            router.push("/chat")
+          }, 1000);
         }
         dispatch(removeSession(id))
       } else {
@@ -558,6 +574,12 @@ const Chat = () => {
 
   const handleRename = async (id, newName) => {
     try {
+      if(!newName){
+        setError("Name cannot be empty")
+        showErrorToast()
+        return
+      }
+
       const { data } = await aiferAxios.patch(`/api/emo/renameChat`, { chatId: id, newTitle: newName }, {
         headers: {
           authorization: process.env.NEXT_PUBLIC_EMO_DEVELOPER_API_KEY,
