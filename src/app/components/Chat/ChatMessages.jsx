@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './Chat.module.css';
-import { marked } from 'marked';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+import rehypeHighlight from 'rehype-highlight';
 import { LuRefreshCcw } from 'react-icons/lu'
 import { SiRobotframework } from "react-icons/si";
 import { useSelector } from 'react-redux';
@@ -87,11 +89,6 @@ const ChatMessages = ({
     return () => document.body.style.overflow = "auto";
   }, [messages]);
 
-  const formatMessage = (content) => {
-    if (!content) return "";
-    return marked(content);
-  };
-
   return (
     <div className={`${styles.messages}`} ref={chatBodyRef}>
 
@@ -104,11 +101,12 @@ const ChatMessages = ({
                 className={`${styles.message} ${message.role === 'user' ? styles.userMessage : styles.aiMessage
                   }`}
               >
-                <div
-                  dangerouslySetInnerHTML={{ __html: formatMessage(message.content) }}
-                  className={styles.messageContent}
-                // ref={(el) => messageRefs.current[index] = el}
-                >
+                <div className={styles.messageContent}>
+                  <ReactMarkdown
+                    children={message.content}
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeHighlight]}
+                  />
                 </div>
                 {/* {message.role === 'assistant-remote' && (
                   <div className={styles.responseOptions}>
@@ -146,18 +144,22 @@ const ChatMessages = ({
             {/* Chat messages */}
             {messages.map((message, index) => (
               <div
-                key={index}
-                className={`${styles.message} ${message.role === 'user' ? styles.userMessage : styles.aiMessage}`}
-              >
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: message.role === 'user'
-                      ? formatMessage(message.content)
-                      : formattedPyqData(message.content)
-                  }}
-                  className={styles.messageContent}
-                ></div>
+              key={index}
+              className={`${styles.message} ${message.role === 'user' ? styles.userMessage : styles.aiMessage}`}
+            >
+              <div className={styles.messageContent}>
+                {message.role === 'user' ? (
+                  <ReactMarkdown
+                    children={message.content}
+                    remarkPlugins={[remarkGfm]}
+                    rehypePlugins={[rehypeHighlight]}
+                  />
+                ) : (
+                  <div dangerouslySetInnerHTML={{ __html: formattedPyqData(message.content) }} />
+                )}
               </div>
+            </div>
+            
             ))}
 
             {/* Popular Questions (shown after messages) */}
@@ -165,7 +167,7 @@ const ChatMessages = ({
               <div className={styles.popularQuestions}>
                 <div className='text-center mb-4'>
                   <h5 className="fw-bold text-center">
-                    <strong>{messages[messages.length-1].content}</strong> - Popular Questions
+                    <strong>{messages[messages.length - 1].content}</strong> - Popular Questions
                   </h5>
                   {!responseLoading && popularQuestions.parsed && <p>Please select a question to see answer</p>}
                 </div>

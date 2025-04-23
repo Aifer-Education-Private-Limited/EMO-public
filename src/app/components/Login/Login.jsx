@@ -629,7 +629,7 @@ const Login = ({ handleClose, URL }) => {
                                         setShowForgetPass(true)
                                         setIsEmailSignin(false)
                                     }}
-                                >Forget password?</p>
+                                >Forgot password?</p>
                             </div>
                             <button type="submit"
                                 disabled={loading} className={styles.submitButton}>
@@ -889,6 +889,7 @@ const Login = ({ handleClose, URL }) => {
                             setIsEmailSignin(true)
                             setIsEmailSend(false)
                             setEmail("")
+                            setPassword("")
                         }}
                         type="submit"
                         disabled={loading}
