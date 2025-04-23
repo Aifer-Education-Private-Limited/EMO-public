@@ -33,6 +33,20 @@ const ChatSidebar = ({
     const historyContainerRef = useRef(null);
     const { chatHistoryCount } = useSelector((state) => state.chat);
     const optionsRef = useRef(null);
+    const longPressTimeout = useRef(null);
+
+    const handleLongPressStart = (chatId) => {
+        longPressTimeout.current = setTimeout(() => {
+            toggleChatOptions(chatId);
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+              }
+        }, 500);
+    };
+    
+    const handleLongPressEnd = () => {
+        clearTimeout(longPressTimeout.current);
+    };
 
     const isFetchingRef = useRef(false);
     const selectedSessionId = useSelector((state) => state.chat.selectedSessionId);
@@ -93,7 +107,10 @@ const ChatSidebar = ({
         <div
             key={chat._id}
             onClick={() => handleSelectSession(chat._id)}
-            className={`${styles.chatHistoryItem} ${chat._id === selectedSessionId && styles.SelectedItem} d-flex justify-content-between`}
+            onTouchStart={() => handleLongPressStart(chat._id)}
+            onTouchEnd={handleLongPressEnd}
+            onTouchCancel={handleLongPressEnd}
+            className={`${styles.chatHistoryItem} ${chat._id === selectedSessionId && styles.SelectedItem} d-flex justify-content-between no-select`}
         >
             <span>
                 {editingChatId === chat._id ? (

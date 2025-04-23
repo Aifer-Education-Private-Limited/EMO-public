@@ -77,6 +77,11 @@ body {
   background: #808080;
 }
 
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
 
 @media screen and (max-width: 576px) {
   .section-title {
