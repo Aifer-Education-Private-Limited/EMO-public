@@ -1,18 +1,23 @@
-import jwt from 'jsonwebtoken'
-import axios from '../constants/axios'
+import jwt from 'jsonwebtoken';
+import axios from '../constants/axios';
 
-export async function getUserCourses() {
-  let courses = ''
-  const token = localStorage.getItem('studentToken')
-  if (token) {
-    const decode = jwt.decode(token)
-    if (decode) {
-      const userId = decode.id
-      const {data} = await axios.get(`/getUserCourses/${userId}`)
+export async function getSubscription(uid) {
+  try {
+    let subscription;
+    const { data } = await axios.get(`/api/emo/subscription/${uid}`, {
+      headers: {
+        authorization: process.env.NEXT_PUBLIC_EMO_DEVELOPER_API_KEY,
+      }
+    });
 
-      courses = data;
+    if (data && data.success) {
+      subscription = data.subscription;
+    } else {
+      return null;
     }
-  }
 
-  return courses
+    return subscription;
+  } catch (error) {
+    return null;
+  }
 }

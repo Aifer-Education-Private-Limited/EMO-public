@@ -1,0 +1,87 @@
+.paymentSuccessWrapper {
+    min-height: 100vh;
+    background-color: #f2f2f2;
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #01b041;
+}
+
+.paymentCard {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    max-width: 450px;
+    width: 100%;
+    text-align: left;
+}
+
+.paymentCard h5 {
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.paymentCard p {
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+.logoImg {
+    width: auto;
+    height: 100px;
+    object-fit: contain;
+}
+
+
+.premiumMsg {
+    color: grey;
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+
+.successBadge span,
+.failedBadge span{
+    padding: 5px 10px;
+    border-radius: 25px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.successBadge span{
+    background-color: #11ff0034;
+}
+.failedBadge span{
+    background-color: #ff000034;
+}
+
+.startChatBtn {
+    padding: 12px 25px;
+    font-size: 16px;
+    border-radius: 8px;
+    background-color: #0151B0;
+    border: none;
+    transition: background-color 0.3s ease;
+}
+
+.startChatBtn:hover {
+    background-color: #003f8a;
+    color: #fff;
+}
+
+@media screen and (max-width: 576px) {
+    .paymentSuccessWrapper {
+        min-height: 100svh;
+        padding: 10px 20px;
+    }
+
+    .logoImg {
+        width: auto;
+        height: 70px;
+        border-radius: 16px;
+        object-fit: contain;
+    }
+}

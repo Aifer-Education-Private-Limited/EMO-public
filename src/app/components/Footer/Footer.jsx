@@ -17,10 +17,9 @@ const Footer = () => {
 
           <div className="col-lg-2 col-md-4 mb-4">
             <h4 className={styles.title}>Product</h4>
-            <a href="#" className={styles.link}>Features</a>
-            <a href="#" className={styles.link}>Pricing</a>
-            <a href="#" className={styles.link}>Testimonials</a>
-            <a href="#" className={styles.link}>FAQ</a>
+            <a href="#features" className={styles.link}>Features</a>
+            <a href="#pricing" className={styles.link}>Pricing</a>
+            <a href="#testimonials" className={styles.link}>Testimonials</a>
           </div>
 
           <div className="col-lg-2 col-md-4 mb-4">

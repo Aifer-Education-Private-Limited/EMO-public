@@ -1,7 +1,6 @@
 import { URL } from "./Urls";
 import axios from "./axios";
 export const HandleRazorpayPyment = async (PaymentData) => {
-  console.log("PaymentData", PaymentData);
   
   try {
     let key = await axios.get("/getKey");
@@ -20,7 +19,7 @@ export const HandleRazorpayPyment = async (PaymentData) => {
       image:
         "https://play-lh.googleusercontent.com/LO6D3ZFg2LFK6zmef0T-kvmNhrlo4RiTviRMXkRjB4JZO6Bwg4VnjMTsUNz0-bHSgw",
       order_id: txnId, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-      callback_url: `${URL}/PaymentVerification/${PaymentData.mobile}`,
+      callback_url: `${URL}/api/emo/paymentVerification/${PaymentData.mobile}`,
       prefill: {
         name: PaymentData.name,
         email: PaymentData.email,
@@ -29,7 +28,7 @@ export const HandleRazorpayPyment = async (PaymentData) => {
       method: {
         upi: true,     // Enable UPI
         card: true,    // Enable Card
-        netbanking: true,
+        netbanking: false,
         wallet: false,
         emi: false,
         paylater: false

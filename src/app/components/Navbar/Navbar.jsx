@@ -74,7 +74,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className={`navbar navbar-expand-md fixed-top bg-white py-2 px-md-4 ${styles.navbar}`}>
+      <nav className={`navbar navbar-expand-md bg-white py-2 px-md-4 ${styles.navbar}`}>
         <div className="container-fluid">
           <Link href="/" className="navbar-brand d-flex align-items-center">
             <img

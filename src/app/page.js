@@ -16,12 +16,19 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    if (userDetails && userDetails.premium)
+    if (userDetails && userDetails.premium === 'active')
       router.push('/chat');
   }, [userDetails])
 
   return (
     <>
+      {userDetails && userDetails.premium === 'expired' &&
+        <div className="alert alert-dark alert-dismissible fade show" role="alert">
+          Your premium plan has expired. Please <a href='#pricing' className='alert-link'>Renew plan</a> to continue to premium
+          <button type="button" className="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        }
+
       <Navbar />
       <Hero />
       <Features />

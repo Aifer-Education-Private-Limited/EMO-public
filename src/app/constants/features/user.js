@@ -1,23 +1,15 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { getUser } from '../../api/getUserdata'
-import { getUserCourses } from '../../api/getUserCourses'
-
-// Fetch user data
-// const myUser = async () => {
-//     const userdata = await getUser();
-//     return userdata;
-// };
+import { getSubscription } from '../../api/getUserCourses'
 
 // Async thunk for fetching user by ID
 export const fetchUserById = createAsyncThunk('users/fetchByIdStatus', async () => {
+    let subscription = 'free';
     const userdata = await getUser();
-    const courses = await getUserCourses();
-
-    const hasPremium = courses.some(
-        (course) => course.course_id === "EMO Aifer" && course.is_active === 1
-    );
-
-    return { ...userdata, premium: hasPremium };
+    if (userdata && userdata.firebase_uid) {
+        subscription = await getSubscription(userdata.firebase_uid);
+    }
+    return { ...userdata, premium: subscription.status };
 });
 
 // User slice

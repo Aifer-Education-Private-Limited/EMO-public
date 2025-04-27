@@ -53,6 +53,8 @@ const Chat = () => {
   const { currentMode, totalChatCount, chatHistory } = useSelector((state) => state.chat);
   const [toasts, setToasts] = useState({ errorToast: null, successToast: null });
   const searchInputRef = useRef(null);
+  const sidebarRef = useRef(null);
+
   // const [isRegenerating, setIsRegenerating] = useState(false)
 
   const router = useRouter()
@@ -220,8 +222,6 @@ const Chat = () => {
           if (resultRef.current.length === event.data.length) {
             dispatch(addMessage(respondedChatItem));
           } else {
-            // console.log("else");
-            
             dispatch(updateLastAssistantMessage(resultRef.current));
           }
 
@@ -313,7 +313,7 @@ const Chat = () => {
 
       dispatch(moveSessionToTop())
 
-      if (!userDetails.premium) {
+      if (userDetails.premium !== 'active') {
         dispatch(incrementChatCountToday())
       }
 
@@ -323,7 +323,7 @@ const Chat = () => {
   };
 
 
-  const fetchPyqData = async (query) => {    
+  const fetchPyqData = async (query) => {
     setLastQuery(query)
     setResponseError("")
     try {
@@ -336,7 +336,7 @@ const Chat = () => {
       }
 
       const formatted = formattedPyqData(data)
-      
+
       setPopularQuestions(formatted)
       setResponseLoading(false)
 
@@ -628,7 +628,7 @@ const Chat = () => {
   }, [chatid, userDetails])
 
   useEffect(() => {
-    if (userDetails && !userDetails.premium) {
+    if (userDetails?.premium && userDetails.premium !== 'active') {
       getChatCountToday()
     }
   }, [userDetails])
@@ -640,9 +640,24 @@ const Chat = () => {
   }, [userDetails, page])
 
   useEffect(() => {
-    getChatHistory()
+    const handleClickOutside = (event) => {
+      if (
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target) &&
+        isSidebarOpen
+      ) {
+        console.log('sidebar is open');
+        
+        toggleSidebar();
+      }
+    };
 
-  }, [page])
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isSidebarOpen]);
 
   const getTitleFromMessages = (messages) => {
     const text = messages.map(msg => msg.content).join(" ");
@@ -659,18 +674,22 @@ const Chat = () => {
     <div className="container-fluid">
       <div className="row">
         {/* Sidebar */}
-        <ChatSidebar
-          isSidebarOpen={isSidebarOpen}
-          history={chatHistory}
-          toggleSidebar={toggleSidebar}
-          onNewChat={handleNewChat}
-          handleSelectSession={handleSelectSession}
-          onDeleteSession={handleDeleteSession}
-          onRenameSession={handleRename}
-          showErrorToast={showErrorToast}
-          page={page}
-          setPage={setPage}
-        />
+        <div 
+            ref={sidebarRef}
+            >
+          <ChatSidebar
+            isSidebarOpen={isSidebarOpen}
+            history={chatHistory}
+            toggleSidebar={toggleSidebar}
+            onNewChat={handleNewChat}
+            handleSelectSession={handleSelectSession}
+            onDeleteSession={handleDeleteSession}
+            onRenameSession={handleRename}
+            showErrorToast={showErrorToast}
+            page={page}
+            setPage={setPage}
+          />
+        </div>
 
         {/* Main Chat Window */}
         <div className="col-md-9 col-lg-9 col-xl-10 px-0">
