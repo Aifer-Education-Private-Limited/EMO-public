@@ -341,7 +341,6 @@ const Chat = () => {
       setResponseLoading(false)
 
     } catch (error) {
-      console.error("Error fetching data:", error);
       setResponseLoading(false)
       setResponseError("An error occurred while fetching data");
     }
@@ -426,7 +425,23 @@ const Chat = () => {
   };
 
   const getSession = async (sessionId) => {
+
+    // If session exists in chathistory, directly use it
+    const existingSession = chatHistory.find(session => session._id === sessionId);
+    if (existingSession) {
+      if (existingSession.mode === "pyq") {
+        dispatch(setCurrentMode("pyq"));
+      } else {
+        dispatch(setCurrentMode("search"));
+      }
+      dispatch(setSelectedSession(existingSession));
+
+      fetchMessages(existingSession._id);
+      return;
+    }
+
     try {
+
       const { data } = await aiferAxios.get(`/api/emo/session/${sessionId}`, {
         headers: {
           authorization: process.env.NEXT_PUBLIC_EMO_DEVELOPER_API_KEY,
@@ -448,7 +463,8 @@ const Chat = () => {
         showErrorToast()
       }
     } catch (error) {
-      console.log(error);
+      setError("Error fetching session")
+      showErrorToast()
     }
   }
 
@@ -646,8 +662,6 @@ const Chat = () => {
         !sidebarRef.current.contains(event.target) &&
         isSidebarOpen
       ) {
-        console.log('sidebar is open');
-        
         toggleSidebar();
       }
     };
@@ -674,9 +688,9 @@ const Chat = () => {
     <div className="container-fluid">
       <div className="row">
         {/* Sidebar */}
-        <div 
-            ref={sidebarRef}
-            >
+        <div
+          ref={sidebarRef}
+        >
           <ChatSidebar
             isSidebarOpen={isSidebarOpen}
             history={chatHistory}
