@@ -6,8 +6,11 @@ import { getSubscription } from '../../api/getUserCourses'
 export const fetchUserById = createAsyncThunk('users/fetchByIdStatus', async () => {
     let subscription = 'free';
     const userdata = await getUser();
-    if (userdata && userdata.firebase_uid) {
-        subscription = await getSubscription(userdata.firebase_uid);
+    if (userdata) {
+        const result = await getSubscription(userdata.firebase_uid);
+        if(result){
+            subscription = result;
+        }
     }
     return { ...userdata, premium: subscription.status };
 });

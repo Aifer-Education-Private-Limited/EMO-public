@@ -25,6 +25,8 @@ const ChatSidebar = ({
     onDeleteSession,
     onRenameSession,
     setPage,
+    ref,
+    onClose
 }) => {
     const [openChatOptions, setOpenChatOptions] = useState(null);
     const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -40,10 +42,10 @@ const ChatSidebar = ({
             toggleChatOptions(chatId);
             if (navigator.vibrate) {
                 navigator.vibrate(50);
-              }
+            }
         }, 500);
     };
-    
+
     const handleLongPressEnd = () => {
         clearTimeout(longPressTimeout.current);
     };
@@ -97,14 +99,15 @@ const ChatSidebar = ({
         if (openChatOptions) {
             document.addEventListener("mousedown", handleClickOutside);
         }
-    
+
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [openChatOptions]);    
+    }, [openChatOptions]);
 
     const renderChatItem = (chat, index) => (
         <div
+            ref={ref}
             key={chat._id}
             onClick={() => handleSelectSession(chat._id)}
             onTouchStart={() => handleLongPressStart(chat._id)}
@@ -154,7 +157,7 @@ const ChatSidebar = ({
                     <BiDotsHorizontalRounded size={20} />
                 </button>
                 {openChatOptions === chat._id && (
-                    <div className={`${index === history.length-1 ? styles.optionsMenuTop : styles.optionsMenu}`} ref={optionsRef}>
+                    <div className={`${index === history.length - 1 ? styles.optionsMenuTop : styles.optionsMenu}`} ref={optionsRef}>
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -165,10 +168,10 @@ const ChatSidebar = ({
                         >
                             Rename
                         </button>
-                        <button onClick={(e) =>{ 
+                        <button onClick={(e) => {
                             e.stopPropagation()
                             onDeleteSession(chat._id)
-                            }}>Delete</button>
+                        }}>Delete</button>
                     </div>
                 )}
             </div>
@@ -202,7 +205,10 @@ const ChatSidebar = ({
                     </div>
 
                     <button
-                        onClick={toggleSidebar}
+                        onClick={(e) => { 
+                            e.stopPropagation()
+                            onClose()
+                        }}
                         className={`d-md-none ${styles.closeButton}`}
                     >
                         <IoClose size={26} />

@@ -424,6 +424,10 @@ const Chat = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const closeSidebar = () => {
+    setIsSidebarOpen(false)
+  }
+
   const getSession = async (sessionId) => {
 
     // If session exists in chathistory, directly use it
@@ -657,9 +661,10 @@ const Chat = () => {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      if (!sidebarRef.current) return;
+      
       if (
-        sidebarRef.current &&
-        !sidebarRef.current.contains(event.target) &&
+        !sidebarRef.current.contains(event.target) && 
         isSidebarOpen
       ) {
         toggleSidebar();
@@ -688,22 +693,20 @@ const Chat = () => {
     <div className="container-fluid">
       <div className="row">
         {/* Sidebar */}
-        <div
+        <ChatSidebar
           ref={sidebarRef}
-        >
-          <ChatSidebar
-            isSidebarOpen={isSidebarOpen}
-            history={chatHistory}
-            toggleSidebar={toggleSidebar}
-            onNewChat={handleNewChat}
-            handleSelectSession={handleSelectSession}
-            onDeleteSession={handleDeleteSession}
-            onRenameSession={handleRename}
-            showErrorToast={showErrorToast}
-            page={page}
-            setPage={setPage}
-          />
-        </div>
+          isSidebarOpen={isSidebarOpen}
+          history={chatHistory}
+          toggleSidebar={toggleSidebar}
+          onNewChat={handleNewChat}
+          handleSelectSession={handleSelectSession}
+          onDeleteSession={handleDeleteSession}
+          onRenameSession={handleRename}
+          showErrorToast={showErrorToast}
+          page={page}
+          setPage={setPage}
+          onClose={closeSidebar}
+        />
 
         {/* Main Chat Window */}
         <div className="col-md-9 col-lg-9 col-xl-10 px-0">
