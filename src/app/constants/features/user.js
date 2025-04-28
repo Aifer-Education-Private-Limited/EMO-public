@@ -9,10 +9,10 @@ export const fetchUserById = createAsyncThunk('users/fetchByIdStatus', async () 
     if (userdata) {
         const result = await getSubscription(userdata.firebase_uid);
         if(result){
-            subscription = result;
-        }
+            subscription = result.status;
+        } 
     }
-    return { ...userdata, premium: subscription.status };
+    return { ...userdata, premium: subscription };
 });
 
 // User slice

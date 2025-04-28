@@ -385,6 +385,8 @@ const Chat = () => {
 
   const handleNewChat = () => {
     dispatch(clearMessages())
+    dispatch(setSelectedSession(null))
+    dispatch(setSelectedSessionId(null))
     router.push("/chat")
   }
 
