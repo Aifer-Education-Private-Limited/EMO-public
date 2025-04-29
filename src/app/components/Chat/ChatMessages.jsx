@@ -7,6 +7,7 @@ import { LuRefreshCcw } from 'react-icons/lu'
 import { SiRobotframework } from "react-icons/si";
 import { useSelector } from 'react-redux';
 import { FaPen } from 'react-icons/fa6';
+import { MdOutlineSaveAlt } from 'react-icons/md';
 
 const ChatMessages = ({
   currentMode,
@@ -20,6 +21,29 @@ const ChatMessages = ({
   handleClickEditQuery
 }) => {
   const messages = useSelector((state) => state.chat.messages);
+  const messageRefs = useRef([]);
+
+  
+  const exportToPdf = async (index) => {
+    const html2pdf = (await import('html2pdf.js')).default;
+
+    const element = messageRefs.current[index];
+    if (!element) return;
+
+    const options = {
+      margin: 10,
+      filename: "chat.pdf",
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    html2pdf()
+      .from(element)
+      .set(options)
+      .save();
+    
+  }
 
   const formattedPyqData = (data) => {
     const originalDescription = data || "";
@@ -101,7 +125,7 @@ const ChatMessages = ({
                 className={`${styles.message} ${message.role === 'user' ? styles.userMessage : styles.aiMessage
                   }`}
               >
-                <div className={styles.messageContent}>
+                <div className={styles.messageContent} ref={el => messageRefs.current[index] = el}>
                   <ReactMarkdown
                     children={message.content}
                     remarkPlugins={[remarkGfm]}
@@ -119,6 +143,16 @@ const ChatMessages = ({
                       </button>}
                   </div>
                 )} */}
+                {message.role !== 'user' && (
+                  <div className={styles.responseOptions}>
+                    {responseLoading === false &&
+                      <button
+                        onClick={() => exportToPdf(index)}
+                      >
+                        <MdOutlineSaveAlt size={17} />
+                      </button>}
+                  </div>
+                )}
               </div>
             )) :
             <div className='text-center mt-5'>
