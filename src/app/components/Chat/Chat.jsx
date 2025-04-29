@@ -105,9 +105,10 @@ const Chat = () => {
       const question = { content: searchQuery, role: "user" };
       if (!isEditQuery) dispatch(addMessage(question));
       fetchPyqData(searchQuery)
-    } else {
-      console.log("else");
     }
+    //  else {
+    //   console.log("else");
+    // }
   }
 
   async function fetchData(userQuery, id, mode, prevChat, isRegenerating) {
@@ -241,9 +242,9 @@ const Chat = () => {
         resultRef.current = "";
         controller.abort();
       },
-      onerror(err) {
-        console.log("There was an error from the server", err);
-      },
+      // onerror(err) {
+      //   console.log("There was an error from the server", err);
+      // },
     });
 
     setResponseLoading(false)
@@ -285,6 +286,21 @@ const Chat = () => {
     }
   }
 
+  const handleIncrementChatCount = async () => {
+    try {
+      await aiferAxios.put(`/api/emo/incrementChatCounts/${userDetails.firebase_uid}`, {
+        type: currentMode, incrementBy: 1
+      }, {
+        headers: {
+          authorization: process.env.NEXT_PUBLIC_EMO_DEVELOPER_API_KEY,
+        },
+      })
+    } catch (error) {
+      // console.log(error);
+      
+    }
+  }
+
   const saveMessages = async (messages) => {
     try {
       let sessionId = selectedSessionId;
@@ -314,6 +330,7 @@ const Chat = () => {
       dispatch(moveSessionToTop())
 
       if (userDetails.premium !== 'active') {
+        handleIncrementChatCount()
         dispatch(incrementChatCountToday())
       }
 
@@ -516,9 +533,7 @@ const Chat = () => {
       if (data.success) {
         dispatch(setChatCountToday(data.counts))
       }
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   }
 
   const getChatHistory = async () => {
@@ -544,9 +559,7 @@ const Chat = () => {
           dispatch(setChatHistory([...chatHistory, ...data.data]))
         }
       }
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   }
 
   const handleSelectSession = (id) => {
@@ -650,7 +663,7 @@ const Chat = () => {
   }, [chatid, userDetails])
 
   useEffect(() => {
-    if (userDetails?.premium && userDetails.premium !== 'active') {
+    if (userDetails?.premium && userDetails.premium !== 'active' && userDetails?.firebase_uid) {
       getChatCountToday()
     }
   }, [userDetails])
@@ -664,9 +677,9 @@ const Chat = () => {
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!sidebarRef.current) return;
-      
+
       if (
-        !sidebarRef.current.contains(event.target) && 
+        !sidebarRef.current.contains(event.target) &&
         isSidebarOpen
       ) {
         toggleSidebar();
