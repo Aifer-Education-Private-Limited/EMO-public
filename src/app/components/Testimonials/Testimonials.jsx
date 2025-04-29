@@ -4,21 +4,21 @@ const Testimonials = () => {
   const testimonials = [
     {
       quote: "Emo helped me crack my competitive exam with personalized study plans and instant doubt resolution.",
-      name: "Sarah Johnson",
+      name: "Ali Akbar",
       role: "UPSC Aspirant",
-      avatar: "https://i.pravatar.cc/150?img=1"
+      avatar: "https://cdn-icons-png.flaticon.com/512/17561/17561717.png"
     },
     {
       quote: "The AI-powered practice tests were game-changers in my preparation. Highly recommended!",
-      name: "Michael Chen",
+      name: "Anshid",
       role: "Medical Student",
-      avatar: "https://i.pravatar.cc/150?img=2"
+      avatar: "https://cdn-icons-png.flaticon.com/512/17561/17561717.png"
     },
     {
       quote: "Best investment for my exam preparation. The 24/7 AI support is incredibly helpful.",
-      name: "Priya Patel",
+      name: "Rishad",
       role: "CAT Aspirant",
-      avatar: "https://i.pravatar.cc/150?img=3"
+      avatar: "https://cdn-icons-png.flaticon.com/512/17561/17561717.png"
     }
   ];
 
