@@ -18,11 +18,19 @@ const ChatMessages = ({
   regenrateResponse,
   onselectQuestion,
   showPopularQuestions,
-  handleClickEditQuery
+  handleClickEditQuery,
 }) => {
   const messages = useSelector((state) => state.chat.messages);
   const messageRefs = useRef([]);
+  const [isInitialLoad, setIsInitialLoad] = useState(true)
+  const [visibleOptions, setVisibleOptions] = useState(messages.map(() => true));
 
+  useEffect(() => {
+    setVisibleOptions(prev => {
+      const safePrev = Array.isArray(prev) ? prev : [];
+      return messages.map((_, index) => safePrev[index] ?? true);
+    });
+  }, [messages]);
   
   const exportToPdf = async (index) => {
     const html2pdf = (await import('html2pdf.js')).default;
@@ -42,7 +50,7 @@ const ChatMessages = ({
       .from(element)
       .set(options)
       .save();
-    
+
   }
 
   const formattedPyqData = (data) => {
@@ -94,14 +102,32 @@ const ChatMessages = ({
 
 
   useEffect(() => {
-    if (chatBodyRef.current && messages.length > 0) {
+    if (chatBodyRef.current && messages.length > 0 && isInitialLoad) {
       chatBodyRef.current.scrollTo({
         top: chatBodyRef.current.scrollHeight,
         behavior: "smooth",
       });
+      setIsInitialLoad(false)
     }
-  }, [messages, currentMode]);
+  }, [messages]);
 
+  useEffect(() => {
+    if (chatBodyRef.current && responseLoading) {
+      chatBodyRef.current.scrollTo({
+        top: chatBodyRef.current.scrollHeight - 200, // Scroll just near the bottom
+        behavior: 'smooth',
+      });
+    }
+  }, [messages.length, responseLoading]);
+
+  useEffect(() => {
+    if (chatBodyRef.current && !responseLoading) {
+      chatBodyRef.current.scrollTo({
+        top: chatBodyRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [responseLoading]);
 
   useEffect(() => {
     if (messages.length <= 1) {
@@ -143,14 +169,13 @@ const ChatMessages = ({
                       </button>}
                   </div>
                 )} */}
-                {message.role !== 'user' && (
+                {message.role !== 'user' && visibleOptions[index] && (
                   <div className={styles.responseOptions}>
-                    {responseLoading === false &&
                       <button
                         onClick={() => exportToPdf(index)}
                       >
                         <MdOutlineSaveAlt size={17} />
-                      </button>}
+                      </button>
                   </div>
                 )}
               </div>
@@ -178,22 +203,22 @@ const ChatMessages = ({
             {/* Chat messages */}
             {messages.map((message, index) => (
               <div
-              key={index}
-              className={`${styles.message} ${message.role === 'user' ? styles.userMessage : styles.aiMessage}`}
-            >
-              <div className={styles.messageContent}>
-                {message.role === 'user' ? (
-                  <ReactMarkdown
-                    children={message.content}
-                    remarkPlugins={[remarkGfm]}
-                    rehypePlugins={[rehypeHighlight]}
-                  />
-                ) : (
-                  <div dangerouslySetInnerHTML={{ __html: formattedPyqData(message.content) }} />
-                )}
+                key={index}
+                className={`${styles.message} ${message.role === 'user' ? styles.userMessage : styles.aiMessage}`}
+              >
+                <div className={styles.messageContent}>
+                  {message.role === 'user' ? (
+                    <ReactMarkdown
+                      children={message.content}
+                      remarkPlugins={[remarkGfm]}
+                      rehypePlugins={[rehypeHighlight]}
+                    />
+                  ) : (
+                    <div dangerouslySetInnerHTML={{ __html: formattedPyqData(message.content) }} />
+                  )}
+                </div>
               </div>
-            </div>
-            
+
             ))}
 
             {/* Popular Questions (shown after messages) */}

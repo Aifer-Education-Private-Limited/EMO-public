@@ -219,7 +219,7 @@ const Chat = () => {
             role: "assistant-remote",
           };
 
-          if (resultRef.current.length === event.data.length) {
+          if (resultRef.current.length === event.data.length && event.data.trim() !== "") {
             dispatch(addMessage(respondedChatItem));
           } else {
             dispatch(updateLastAssistantMessage(resultRef.current));

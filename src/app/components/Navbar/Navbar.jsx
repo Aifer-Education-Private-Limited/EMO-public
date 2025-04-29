@@ -99,7 +99,10 @@ export default function Navbar() {
                 </button>
                 {userDropdownOpen && (
                   <ul className={styles.dropdownMenu}>
-                    <li onClick={userLogout}>
+                    <li onMouseDown={(e) => {
+                      e.stopPropagation()
+                      userLogout()
+                    }}>
                       <button className={styles.logoutBtn}>
                         Logout
                       </button>

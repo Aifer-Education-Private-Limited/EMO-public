@@ -107,7 +107,6 @@ const ChatSidebar = ({
 
     const renderChatItem = (chat, index) => (
         <div
-            ref={ref}
             key={chat._id}
             onClick={() => handleSelectSession(chat._id)}
             onTouchStart={() => handleLongPressStart(chat._id)}
@@ -180,8 +179,7 @@ const ChatSidebar = ({
 
     return (
         <div
-            // ref={historyContainerRef}
-            // onScroll={handleScroll}  
+            ref={ref}
             className={`col-md-3 col-lg-3 col-xl-2 px-0 ${styles.sidebar} ${isSidebarOpen ? styles.sidebarOpen : ''}`}
         >
             <div className="p-3">
@@ -208,6 +206,7 @@ const ChatSidebar = ({
                         onClick={(e) => { 
                             e.stopPropagation()
                             onClose()
+                            setUserDropdownOpen(false)
                         }}
                         className={`d-md-none ${styles.closeButton}`}
                     >
