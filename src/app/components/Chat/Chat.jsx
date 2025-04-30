@@ -12,6 +12,7 @@ import axios from 'axios';
 import aiferAxios from '../../constants/axios'
 import { useParams, useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
+import keyword_extractor from 'keyword-extractor';
 import {
   addChatHistory,
   addMessage,
@@ -29,7 +30,6 @@ import {
   setSelectedSessionId,
   updateLastAssistantMessage
 } from '@/app/constants/features/chat';
-import keyword_extractor from 'keyword-extractor';
 
 const Chat = () => {
   const dispatch = useDispatch()
@@ -67,19 +67,21 @@ const Chat = () => {
   const handleSend = async (e) => {
     e.preventDefault()
 
-    if (currentMode === "pyq" && totalChatCount.pyq >= 5) {
-      setError("You have reached the maximum number of chats for today. Please try again tomorrow.")
-      showErrorToast()
-      return
-    } else if (currentMode === "search" && totalChatCount.search >= 5) {
-      setError("You have reached the maximum number of chats for today. Please try again tomorrow.")
-      showErrorToast()
-      return
-    }
-    if (isEditQuery) {
-      const position = messages.length - 1;
-      const newMessage = searchQuery;
-      await dispatch(editMessage({ position, newMessage }))
+    if (userDetails.premium !== 'active') {
+      if (currentMode === "pyq" && totalChatCount.pyq >= 5) {
+        setError("You have reached the maximum number of chats for today. Please try again tomorrow.")
+        showErrorToast()
+        return
+      } else if (currentMode === "search" && totalChatCount.search >= 5) {
+        setError("You have reached the maximum number of chats for today. Please try again tomorrow.")
+        showErrorToast()
+        return
+      }
+      if (isEditQuery) {
+        const position = messages.length - 1;
+        const newMessage = searchQuery;
+        await dispatch(editMessage({ position, newMessage }))
+      }
     }
     onSubmitNewMessage()
     setIsEditQuery(false)
@@ -694,7 +696,7 @@ const Chat = () => {
   }, [isSidebarOpen]);
 
   const getTitleFromMessages = (messages) => {
-    const text = messages.map(msg => msg.content).join(" ");
+    const text = messages[0].content
     const keywords = keyword_extractor.extract(text, {
       language: "english",
       remove_digits: true,
