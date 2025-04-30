@@ -127,8 +127,6 @@ const ChatMessages = ({
   const exportToPdf = async (index) => {
     const element = messageRefs.current[index];
     if (!element) return;
-    console.log(element);
-
 
     const content = convertHtmlToPdfElements(element);
 
@@ -211,14 +209,14 @@ const ChatMessages = ({
     }
   }, [messages.length, responseLoading]);
 
-  useEffect(() => {
-    if (chatBodyRef.current && !responseLoading) {
-      chatBodyRef.current.scrollTo({
-        top: chatBodyRef.current.scrollHeight,
-        behavior: 'smooth',
-      });
-    }
-  }, [responseLoading]);
+  // useEffect(() => { // to scroll to bottom when ended generating
+  //   if (chatBodyRef.current && !responseLoading) {
+  //     chatBodyRef.current.scrollTo({
+  //       top: chatBodyRef.current.scrollHeight,
+  //       behavior: 'smooth',
+  //     });
+  //   }
+  // }, [responseLoading]);
 
   useEffect(() => {
     if (messages.length <= 1) {
