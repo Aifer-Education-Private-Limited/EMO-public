@@ -43,39 +43,87 @@ const ChatMessages = ({
     list: { marginLeft: 10, fontSize: 12, marginBottom: 8 },
   });
 
-  const convertHtmlToPdfElements = (node) => {
-    const children = Array.from(node.childNodes).map((child) => convertHtmlToPdfElements(child)).filter(Boolean);
-
-    switch (node.nodeName.toLowerCase()) {
-      case '#text':
-        return <Text>{node.nodeValue.trim()}</Text>;
+  const convertHtmlToPdfElements = (node, olStart = 1, olIndexRef = { current: 0 }) => {
+    const nodeName = node.nodeName.toLowerCase();
+  
+    if (nodeName === '#text') {
+      const trimmed = node.nodeValue.trim();
+      return trimmed ? <Text>{trimmed}</Text> : null;
+    }
+  
+    const children = Array.from(node.childNodes)
+      .map((child) => convertHtmlToPdfElements(child, olStart, olIndexRef))
+      .filter(Boolean);
+  
+    switch (nodeName) {
       case 'p':
         return <Text style={rendererStyles.p}>{children}</Text>;
+  
       case 'h1':
         return <Text style={rendererStyles.h1}>{children}</Text>;
       case 'h2':
         return <Text style={rendererStyles.h2}>{children}</Text>;
       case 'h3':
         return <Text style={rendererStyles.h3}>{children}</Text>;
-      case 'ul':
-      case 'ol':
-        return <View style={rendererStyles.list}>{children}</View>;
-      case 'li':
-        return <Text style={rendererStyles.p}>• {children}</Text>;
+  
       case 'strong':
       case 'b':
         return <Text style={{ fontWeight: 'bold' }}>{children}</Text>;
       case 'em':
       case 'i':
         return <Text style={{ fontStyle: 'italic' }}>{children}</Text>;
+  
+      case 'ul':
+        return (
+          <View style={rendererStyles.list}>
+            {Array.from(node.childNodes).map((li) => convertHtmlToPdfElements(li))}
+          </View>
+        );
+  
+      case 'ol': {
+        // Reset or start from given index
+        const start = parseInt(node.getAttribute('start') || '1', 10);
+        olIndexRef.current = start;
+  
+        return (
+          <View style={rendererStyles.list}>
+            {Array.from(node.childNodes).map((li) =>
+              convertHtmlToPdfElements(li, start, olIndexRef)
+            )}
+          </View>
+        );
+      }
+  
+      case 'li': {
+        let bullet;
+        if (node.parentNode.nodeName.toLowerCase() === 'ol') {
+          bullet = `${olIndexRef.current++}. `;
+        } else {
+          bullet = '• ';
+        }
+  
+        // Flatten <p> inside <li> for cleaner layout
+        const flattenedChildren = children.length === 1 && children[0].type === Text
+          ? children
+          : [<View>{children}</View>];
+  
+        return (
+          <View style={{ flexDirection: 'row', marginBottom: 4 }}>
+            <Text style={rendererStyles.p}>{bullet}</Text>
+            <View style={{ flex: 1 }}>{flattenedChildren}</View>
+          </View>
+        );
+      }
+  
       case 'div':
       case 'span':
         return <View>{children}</View>;
+  
       default:
         return null;
     }
   };
-
+  
   const exportToPdf = async (index) => {
     const element = messageRefs.current[index];
     if (!element) return;
