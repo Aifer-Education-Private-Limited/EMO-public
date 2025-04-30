@@ -317,7 +317,7 @@ const ChatMessages = ({
                   <h5 className="fw-bold text-center">
                     <strong>{messages[messages.length - 1].content}</strong> - Popular Questions
                   </h5>
-                  {!responseLoading && popularQuestions.parsed && <p>Please select a question to see answer</p>}
+                  {!responseLoading && popularQuestions[0].parsed && <p>Please select a question to see answer</p>}
                 </div>
                 <div className="row g-3">
                   {responseLoading ? (
@@ -382,7 +382,7 @@ const ChatMessages = ({
                       </div>
                     )))}
                 </div>
-                {!responseLoading && popularQuestions.parsed && <p className='text-center my-4'>Please select a question to see the answer</p>}
+                {!responseLoading && popularQuestions[0].parsed && <p className='text-center my-4'>Please select a question to see the answer</p>}
               </div>
             )}
           </>
