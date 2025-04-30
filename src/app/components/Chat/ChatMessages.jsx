@@ -3,11 +3,13 @@ import styles from './Chat.module.css';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import rehypeHighlight from 'rehype-highlight';
-import { LuRefreshCcw } from 'react-icons/lu'
+// import { LuRefreshCcw } from 'react-icons/lu'
 import { SiRobotframework } from "react-icons/si";
 import { useSelector } from 'react-redux';
 import { FaPen } from 'react-icons/fa6';
 import { MdOutlineSaveAlt } from 'react-icons/md';
+import { Document, Page, Text, View, StyleSheet, pdf } from '@react-pdf/renderer';
+import { saveAs } from 'file-saver';
 
 const ChatMessages = ({
   currentMode,
@@ -31,27 +33,68 @@ const ChatMessages = ({
       return messages.map((_, index) => safePrev[index] ?? true);
     });
   }, [messages]);
-  
-  const exportToPdf = async (index) => {
-    const html2pdf = (await import('html2pdf.js')).default;
 
+  const rendererStyles = StyleSheet.create({
+    page: { padding: 20 },
+    h1: { fontSize: 24, marginBottom: 10 },
+    h2: { fontSize: 20, marginBottom: 8 },
+    h3: { fontSize: 18, marginBottom: 6 },
+    p: { fontSize: 10, marginBottom: 4 },
+    list: { marginLeft: 10, fontSize: 12, marginBottom: 8 },
+  });
+
+  const convertHtmlToPdfElements = (node) => {
+    const children = Array.from(node.childNodes).map((child) => convertHtmlToPdfElements(child)).filter(Boolean);
+
+    switch (node.nodeName.toLowerCase()) {
+      case '#text':
+        return <Text>{node.nodeValue.trim()}</Text>;
+      case 'p':
+        return <Text style={rendererStyles.p}>{children}</Text>;
+      case 'h1':
+        return <Text style={rendererStyles.h1}>{children}</Text>;
+      case 'h2':
+        return <Text style={rendererStyles.h2}>{children}</Text>;
+      case 'h3':
+        return <Text style={rendererStyles.h3}>{children}</Text>;
+      case 'ul':
+      case 'ol':
+        return <View style={rendererStyles.list}>{children}</View>;
+      case 'li':
+        return <Text style={rendererStyles.p}>• {children}</Text>;
+      case 'strong':
+      case 'b':
+        return <Text style={{ fontWeight: 'bold' }}>{children}</Text>;
+      case 'em':
+      case 'i':
+        return <Text style={{ fontStyle: 'italic' }}>{children}</Text>;
+      case 'div':
+      case 'span':
+        return <View>{children}</View>;
+      default:
+        return null;
+    }
+  };
+
+  const exportToPdf = async (index) => {
     const element = messageRefs.current[index];
     if (!element) return;
+    console.log(element);
 
-    const options = {
-      margin: 10,
-      filename: "chat.pdf",
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
 
-    html2pdf()
-      .from(element)
-      .set(options)
-      .save();
+    const content = convertHtmlToPdfElements(element);
 
-  }
+    const MyDocument = () => (
+      <Document>
+        <Page size="A4" style={rendererStyles.page}>
+          {content}
+        </Page>
+      </Document>
+    );
+
+    const blob = await pdf(<MyDocument />).toBlob();
+    saveAs(blob, 'export.pdf');
+  };
 
   const formattedPyqData = (data) => {
     const originalDescription = data || "";

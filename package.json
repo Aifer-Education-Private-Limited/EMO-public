@@ -10,11 +10,12 @@
   },
   "dependencies": {
     "@microsoft/fetch-event-source": "^2.0.1",
+    "@react-pdf/renderer": "^4.3.0",
     "@reduxjs/toolkit": "^2.6.1",
     "axios": "^1.8.4",
     "bootstrap": "^5.3.5",
+    "file-saver": "^2.0.5",
     "firebase": "^11.4.0",
-    "html2pdf.js": "^0.10.3",
     "jsonwebtoken": "^9.0.2",
     "keyword-extractor": "^0.0.28",
     "next": "15.2.3",
