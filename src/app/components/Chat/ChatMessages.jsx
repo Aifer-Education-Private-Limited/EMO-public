@@ -26,6 +26,7 @@ const ChatMessages = ({
   const messageRefs = useRef([]);
   const [isInitialLoad, setIsInitialLoad] = useState(true)
   const [visibleOptions, setVisibleOptions] = useState(messages.map(() => true));
+  const { selectedSession } = useSelector((state) => state.chat);
 
   useEffect(() => {
     setVisibleOptions(prev => {
@@ -155,7 +156,7 @@ const ChatMessages = ({
     );
 
     const blob = await pdf(<MyDocument />).toBlob();
-    saveAs(blob, 'export.pdf');
+    saveAs(blob, `${selectedSession.title}.pdf` || 'export.pdf');
   };
 
   const formattedPyqData = (data) => {
