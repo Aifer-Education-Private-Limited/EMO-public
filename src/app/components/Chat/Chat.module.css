@@ -9,7 +9,8 @@
 }
 
 .chatHistory {
-  max-height: calc(100vh - 250px); /* Adjust as needed */
+  max-height: calc(100vh - 250px);
+  /* Adjust as needed */
   /* overflow-y: auto; */
 }
 
@@ -24,7 +25,8 @@
 
 .chatTitle {
   display: inline-block;
-  max-width: 200px; /* Adjust based on your layout */
+  max-width: 200px;
+  /* Adjust based on your layout */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -174,7 +176,7 @@
   border: 1px solid #b7b7b7;
 }
 
-.userAvatar{
+.userAvatar {
   position: relative;
 }
 
@@ -219,7 +221,8 @@
   top: 50%;
   transform: translateY(-50%);
   z-index: 10;
-  padding-left: 20px; /* space for the blur background */
+  padding-left: 20px;
+  /* space for the blur background */
   overflow: visible;
 }
 
@@ -242,11 +245,11 @@
   background: #e9ecef;
 }
 
-.chatHistoryItem:hover.chatHistoryItem .right .optionsBtn{
+.chatHistoryItem:hover.chatHistoryItem .right .optionsBtn {
   display: block;
 }
 
-.chatHistoryItem.SelectedItem{
+.chatHistoryItem.SelectedItem {
   background-color: #e9ecef;
 }
 
@@ -272,8 +275,10 @@
 .optionsMenuTop {
   position: absolute;
   right: 0;
-  bottom: 100%; /* places the bottom of menu at top of parent */
-  margin-bottom: 8px; /* optional spacing */
+  bottom: 100%;
+  /* places the bottom of menu at top of parent */
+  margin-bottom: 8px;
+  /* optional spacing */
   background: white;
   border-radius: 6px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
@@ -325,7 +330,7 @@
   border-top-right-radius: 0;
 }
 
-.userMessage .messageContent p{
+.userMessage .messageContent p {
   margin-bottom: 0;
 }
 
@@ -341,11 +346,11 @@
   margin-bottom: 0;
 }
 
-.aiMessage .messageContent h3{
+.aiMessage .messageContent h3 {
   font-weight: 700;
 }
 
-.aiMessage .messageContent p{
+.aiMessage .messageContent p {
   font-weight: 400;
 }
 
@@ -359,7 +364,6 @@
   background: none;
   border: none;
   cursor: pointer;
-  margin-top: 8px;
   margin-left: 5px;
   display: flex;
   align-items: center;
@@ -429,19 +433,19 @@
 }
 
 .dropdownMenu li a,
-.dropdownMenuSidebar li a{
+.dropdownMenuSidebar li a {
   text-decoration: none;
   color: black;
   font-weight: 500;
 }
 
-.logoutBtn{
+.logoutBtn {
   border: none;
   background: transparent;
   font-weight: 500;
 }
 
-.dropdownMenuSidebar{
+.dropdownMenuSidebar {
   position: absolute;
   top: 100%;
   background-color: white;
@@ -452,7 +456,7 @@
   padding: 5px 0;
 }
 
-@media  (max-width: 1200px) {
+@media (max-width: 1200px) {
   .messages {
     padding: 20px 50px;
   }
@@ -515,5 +519,9 @@
 @media (max-width: 576px) {
   .sidebar {
     width: 90% !important;
+  }
+
+  .responseOptions {
+    margin-left: 0.5rem;
   }
 }

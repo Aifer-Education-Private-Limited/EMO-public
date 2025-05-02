@@ -736,7 +736,10 @@ const Chat = () => {
                 <Link href="/" className="navbar-brand align-items-center">
                   <img
                     className={styles.logo}
-                    src="/emo-logo.png" alt="emo" />
+                    src="/emo-logo.svg" alt="emo"
+                    width={40}
+                    height={40}
+                     />
                 </Link>
                 <button className={`${styles.closeButton} mt-2`} onClick={toggleSidebar}>
                   <FiMenu size={26} />

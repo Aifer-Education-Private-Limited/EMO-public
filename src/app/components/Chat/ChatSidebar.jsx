@@ -187,8 +187,10 @@ const ChatSidebar = ({
                     <Link href="/" className="navbar-brand align-items-center mb-4 d-none d-md-flex">
                         <img
                             className={styles.logo}
-                            src="/emo-logo.png"
+                            src="/emo-logo.svg"
                             alt="emo"
+                            width={40}
+                            height={40}
                         />
                     </Link>
                     <div className={styles.userAvatar}>

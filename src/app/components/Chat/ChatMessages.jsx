@@ -8,7 +8,7 @@ import { SiRobotframework } from "react-icons/si";
 import { useSelector } from 'react-redux';
 import { FaPen } from 'react-icons/fa6';
 import { MdOutlineSaveAlt } from 'react-icons/md';
-import { Document, Page, Text, View, StyleSheet, pdf } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, pdf, Image } from '@react-pdf/renderer';
 import { saveAs } from 'file-saver';
 
 const ChatMessages = ({
@@ -35,56 +35,68 @@ const ChatMessages = ({
   }, [messages]);
 
   const rendererStyles = StyleSheet.create({
-    page: { padding: 20 },
+    page: {
+      paddingHorizontal: 20,
+      paddingVertical: 40,
+      position: 'relative',
+    },
+    logoBackground: {
+      position: 'absolute',
+      top: '30%',
+      left: '15%',
+      width: 400,
+      height: 'auto',
+      opacity: 0.1,
+    },
     h1: { fontSize: 24, marginBottom: 10 },
     h2: { fontSize: 20, marginBottom: 8 },
     h3: { fontSize: 18, marginBottom: 6 },
     p: { fontSize: 10, marginBottom: 4 },
-    list: { marginLeft: 10, fontSize: 12, marginBottom: 8 },
+    list: { marginLeft: 10, fontSize: 12, marginBottom: 15, marginTop: 15 },
+    listItem: { fontSize: 12, marginBottom: 4 },
   });
-
   const convertHtmlToPdfElements = (node, olStart = 1, olIndexRef = { current: 0 }) => {
     const nodeName = node.nodeName.toLowerCase();
-  
+
     if (nodeName === '#text') {
       const trimmed = node.nodeValue.trim();
       return trimmed ? <Text>{trimmed}</Text> : null;
     }
-  
+
     const children = Array.from(node.childNodes)
       .map((child) => convertHtmlToPdfElements(child, olStart, olIndexRef))
       .filter(Boolean);
-  
+
     switch (nodeName) {
       case 'p':
         return <Text style={rendererStyles.p}>{children}</Text>;
-  
+
       case 'h1':
         return <Text style={rendererStyles.h1}>{children}</Text>;
       case 'h2':
         return <Text style={rendererStyles.h2}>{children}</Text>;
       case 'h3':
         return <Text style={rendererStyles.h3}>{children}</Text>;
-  
+
       case 'strong':
       case 'b':
         return <Text style={{ fontWeight: 'bold' }}>{children}</Text>;
       case 'em':
       case 'i':
         return <Text style={{ fontStyle: 'italic' }}>{children}</Text>;
-  
+
       case 'ul':
         return (
           <View style={rendererStyles.list}>
             {Array.from(node.childNodes).map((li) => convertHtmlToPdfElements(li))}
           </View>
         );
-  
+
       case 'ol': {
         // Reset or start from given index
         const start = parseInt(node.getAttribute('start') || '1', 10);
         olIndexRef.current = start;
-  
+
         return (
           <View style={rendererStyles.list}>
             {Array.from(node.childNodes).map((li) =>
@@ -93,7 +105,7 @@ const ChatMessages = ({
           </View>
         );
       }
-  
+
       case 'li': {
         let bullet;
         if (node.parentNode.nodeName.toLowerCase() === 'ol') {
@@ -101,12 +113,12 @@ const ChatMessages = ({
         } else {
           bullet = '• ';
         }
-  
+
         // Flatten <p> inside <li> for cleaner layout
         const flattenedChildren = children.length === 1 && children[0].type === Text
           ? children
           : [<View>{children}</View>];
-  
+
         return (
           <View style={{ flexDirection: 'row', marginBottom: 4 }}>
             <Text style={rendererStyles.p}>{bullet}</Text>
@@ -114,16 +126,16 @@ const ChatMessages = ({
           </View>
         );
       }
-  
+
       case 'div':
       case 'span':
         return <View>{children}</View>;
-  
+
       default:
         return null;
     }
   };
-  
+
   const exportToPdf = async (index) => {
     const element = messageRefs.current[index];
     if (!element) return;
@@ -133,6 +145,10 @@ const ChatMessages = ({
     const MyDocument = () => (
       <Document>
         <Page size="A4" style={rendererStyles.page}>
+          <Image
+            src="/emo-logo.png"
+            style={rendererStyles.logoBackground}
+          />
           {content}
         </Page>
       </Document>
@@ -260,17 +276,23 @@ const ChatMessages = ({
                 )} */}
                 {message.role !== 'user' && visibleOptions[index] && (
                   <div className={styles.responseOptions}>
-                      <button
-                        onClick={() => exportToPdf(index)}
-                      >
-                        <MdOutlineSaveAlt size={17} />
-                      </button>
+                    <button
+                      onClick={() => exportToPdf(index)}
+                    >
+                      <MdOutlineSaveAlt size={17} />
+                    </button>
                   </div>
                 )}
               </div>
             )) :
             <div className='text-center mt-5'>
-              <img src="/emo-logo.png" alt="Emo" className={styles.bgLogo} />
+              <img
+                src='/emo-logo.svg'
+                alt="Emo"
+                className={styles.bgLogo}
+                height={200}
+                width={500}
+              />
               <h4
                 style={{ color: "rgb(185 185 185)" }}
                 className='mt-3 fw-semibold'
@@ -389,7 +411,7 @@ const ChatMessages = ({
         ) : (
           // Welcome screen
           <div className='text-center mt-5'>
-            <img src="/emo-logo.png" alt="Emo" className={styles.bgLogo} />
+            <img src="/emo-logo.svg" alt="Emo" className={styles.bgLogo} height={200} width={500} />
             <h4 className='mt-3 fw-semibold' style={{ color: "rgb(185 185 185)" }}>
               Previous Year Questions
             </h4>
