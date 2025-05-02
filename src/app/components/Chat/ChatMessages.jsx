@@ -24,6 +24,7 @@ const ChatMessages = ({
 }) => {
   const messages = useSelector((state) => state.chat.messages);
   const messageRefs = useRef([]);
+  const pyqMessageRefs = useRef([]);
   const [isInitialLoad, setIsInitialLoad] = useState(true)
   const [visibleOptions, setVisibleOptions] = useState(messages.map(() => true));
   const { selectedSession } = useSelector((state) => state.chat);
@@ -109,12 +110,13 @@ const ChatMessages = ({
 
       case 'li': {
         let bullet;
-        if (node.parentNode.nodeName.toLowerCase() === 'ol') {
-          bullet = `${olIndexRef.current++}. `;
-        } else {
-          bullet = '• ';
+        if (currentMode === 'search') {
+          if (node.parentNode.nodeName.toLowerCase() === 'ol') {
+            bullet = `${olIndexRef.current++}. `;
+          } else {
+            bullet = '• ';
+          }
         }
-
         // Flatten <p> inside <li> for cleaner layout
         const flattenedChildren = children.length === 1 && children[0].type === Text
           ? children
@@ -138,7 +140,12 @@ const ChatMessages = ({
   };
 
   const exportToPdf = async (index) => {
-    const element = messageRefs.current[index];
+    let element;
+    if (currentMode === 'pyq') {
+      element = pyqMessageRefs.current[index];
+    } else {
+      element = messageRefs.current[index];
+    }
     if (!element) return;
 
     const content = convertHtmlToPdfElements(element);
@@ -318,7 +325,10 @@ const ChatMessages = ({
                 key={index}
                 className={`${styles.message} ${message.role === 'user' ? styles.userMessage : styles.aiMessage}`}
               >
-                <div className={styles.messageContent}>
+                <div
+                 className={styles.messageContent}
+                 ref={el => pyqMessageRefs.current[index] = el}
+                 >
                   {message.role === 'user' ? (
                     <ReactMarkdown
                       children={message.content}
@@ -329,6 +339,15 @@ const ChatMessages = ({
                     <div dangerouslySetInnerHTML={{ __html: formattedPyqData(message.content) }} />
                   )}
                 </div>
+                {message.role !== 'user' && visibleOptions[index] && (
+                  <div className={styles.responseOptions}>
+                    <button
+                      onClick={() => exportToPdf(index)}
+                    >
+                      <MdOutlineSaveAlt size={17} />
+                    </button>
+                  </div>
+                )}
               </div>
 
             ))}
