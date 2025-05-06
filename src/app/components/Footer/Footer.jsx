@@ -1,5 +1,5 @@
 import styles from './Footer.module.css';
-import { FaGithub, FaLinkedin, FaXTwitter, FaYoutube } from 'react-icons/fa6';
+import { FaLinkedin, FaXTwitter, FaYoutube } from 'react-icons/fa6';
 
 const Footer = () => {
   return (
@@ -7,7 +7,13 @@ const Footer = () => {
       <div className="container">
         <div className="row">
           <div className="col-lg-3 col-md-6 mb-4">
-            <img src="/emo-logo.png" alt="Emo" className={styles.logo} />
+            <img 
+            src="/emo-logo.webp" 
+            alt="Emo" 
+            className={styles.logo} 
+            height={50}
+            width={50}
+            />
             <p className={styles.description}>
               AI-powered exam preparation platform helping students achieve their dreams
             </p>
@@ -26,7 +32,8 @@ const Footer = () => {
           <div className="col-lg-2 col-md-4 mb-4">
             <h4 className={styles.title}>Company</h4>
             <a href="https://aifer.in/aboutus" className={styles.link}>About</a>
-            <a href="https://psybridge.in/" className={styles.link}>Careers</a>
+            <a href="https://psybridge.in/" className={styles.link}>PsyBridge</a>
+            <a href="https://aifer.in/ai_for_teachers" className={styles.link}>AI for Teachers</a>
             <a href="https://aifer.in/contact" className={styles.link}>Contact</a>
           </div>
 
@@ -38,9 +45,9 @@ const Footer = () => {
               <p className="mb-0">&copy; 2025 Emo By Aifer. All rights reserved.</p>
 
               <div className="d-flex gap-3">
-                <a href="https://twitter.com/AiferEducation" className={styles.socialIcon}><FaXTwitter /></a>
-                <a href="https://www.linkedin.com/company/aifer-education/mycompany/" className={styles.socialIcon}><FaLinkedin /></a>
-                <a href="https://www.youtube.com/channel/UCzepo3cTMA8mBmmUytp-hIA" className={styles.socialIcon}><FaYoutube /></a>
+                <a href="https://twitter.com/AiferEducation" className={styles.socialIcon} aria-label='Follow us on Twitter'><FaXTwitter /></a>
+                <a href="https://www.linkedin.com/company/aifer-education/mycompany/" className={styles.socialIcon} aria-label='Follow us on linkedin'><FaLinkedin /></a>
+                <a href="https://www.youtube.com/channel/UCzepo3cTMA8mBmmUytp-hIA" className={styles.socialIcon} aria-label='Youtube channel'><FaYoutube /></a>
               </div>
             </div>
           </div>

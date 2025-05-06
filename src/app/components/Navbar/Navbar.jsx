@@ -79,7 +79,10 @@ export default function Navbar() {
           <Link href="/" className="navbar-brand d-flex align-items-center">
             <img
               className={styles.logo}
-              src="/emo-logo.png" alt="emo" />
+              src="/emo-logo.webp" alt="emo" 
+              height={50}
+              width={50}
+              />
           </Link>
 
           {/* MOBILE VIEW */}
