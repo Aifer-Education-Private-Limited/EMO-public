@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './Chat.module.css';
-import { IoClose, IoSearchSharp } from "react-icons/io5";
+import { IoChevronDown, IoChevronUp, IoClose, IoSearchSharp } from "react-icons/io5";
 import { SiBookstack } from "react-icons/si";
 import { BiDotsHorizontalRounded } from "react-icons/bi";
 import Link from 'next/link';
@@ -26,7 +26,8 @@ const ChatSidebar = ({
     onRenameSession,
     setPage,
     ref,
-    onClose
+    onClose,
+    userDetails
 }) => {
     const [openChatOptions, setOpenChatOptions] = useState(null);
     const [userDropdownOpen, setUserDropdownOpen] = useState(false);
@@ -95,7 +96,7 @@ const ChatSidebar = ({
                 setOpenChatOptions(null);
             }
         };
-    
+
         if (openChatOptions) {
             document.addEventListener("mousedown", handleClickOutside);
         }
@@ -195,6 +196,12 @@ const ChatSidebar = ({
                     </Link>
                     <div className={styles.userAvatar}>
                         <img onClick={toggleUserDropdown} src='/circleavatar.png' alt='avatar' className={`${styles.avatar} d-md-none`} />
+                        <h6
+                            className={`${styles.userName} mt-2 ms-2 d-md-none`}
+                            onClick={toggleUserDropdown}
+                        >
+                            {userDetails ? userDetails.name : ""} {userDropdownOpen ? <IoChevronUp /> : <IoChevronDown />}
+                        </h6>
                         {userDropdownOpen && (
                             <ul className={styles.dropdownMenuSidebar}>
                                 <li onClick={userLogout}>
@@ -205,7 +212,7 @@ const ChatSidebar = ({
                     </div>
 
                     <button
-                        onClick={(e) => { 
+                        onClick={(e) => {
                             e.stopPropagation()
                             onClose()
                             setUserDropdownOpen(false)

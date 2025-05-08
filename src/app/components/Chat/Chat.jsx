@@ -723,6 +723,7 @@ const Chat = () => {
           page={page}
           setPage={setPage}
           onClose={closeSidebar}
+          userDetails={userDetails}
         />
 
         {/* Main Chat Window */}
@@ -748,6 +749,7 @@ const Chat = () => {
 
               {/* Tabs */}
               <ChatTabs
+              userDetails={userDetails}
                 currentMode={currentMode}
               />
 

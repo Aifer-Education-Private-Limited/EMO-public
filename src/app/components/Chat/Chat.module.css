@@ -164,19 +164,21 @@
   color: #848484;
 }
 
-
+.userName {
+  cursor: pointer;
+  position: relative;
+}
 
 .avatar {
-  position: relative;
   width: 40px;
   height: 40px;
   border-radius: 50%;
   object-fit: cover;
-  cursor: pointer;
   border: 1px solid #b7b7b7;
 }
 
 .userAvatar {
+  display: inline-flex;
   position: relative;
 }
 
@@ -456,6 +458,20 @@
   padding: 5px 0;
 }
 
+.scrollDownBtn {
+  position: fixed;
+  bottom: 90px;
+  right: 20px;
+  z-index: 10;
+  background-color: #fff;
+  border: none;
+  border-radius: 50%;
+  padding: 8px 11px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease;
+}
+
 @media (max-width: 1200px) {
   .messages {
     padding: 20px 50px;
@@ -513,6 +529,10 @@
 
   .sidebarOpen {
     left: 0;
+  }
+
+  .scrollDownBtn {
+    bottom: 70px;
   }
 }
 

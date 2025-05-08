@@ -3,8 +3,9 @@ import styles from './Chat.module.css'
 import { useDispatch } from 'react-redux';
 import { clearMessages, setCurrentMode, setSelectedSessionId } from '@/app/constants/features/chat';
 import { useRouter } from 'next/navigation';
+import { IoChevronDown, IoChevronUp } from "react-icons/io5";
 
-const ChatTabs = ({ currentMode }) => {
+const ChatTabs = ({ currentMode, userDetails }) => {
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const toggleUserDropdown = () => setUserDropdownOpen(!userDropdownOpen);
   const dispatch = useDispatch();
@@ -39,12 +40,19 @@ const ChatTabs = ({ currentMode }) => {
           >PYQ</button>
         </div>
 
-        <img
-          src='/circleavatar.png'
-          alt='avatar'
+        <div className='d-inline-flex'>
+          <h6 
+          className={`${styles.userName} mt-2 me-2 d-none d-md-flex`}
           onClick={toggleUserDropdown}
-          className={`${styles.avatar} d-none d-md-flex`}
-        />
+          >
+            {userDetails ? userDetails.name : ""} {userDropdownOpen ? <IoChevronUp size={20} /> :<IoChevronDown size={20} />}
+          </h6>
+          <img
+            src='/circleavatar.png'
+            alt='avatar'
+            className={`${styles.avatar} d-none d-lg-flex`}
+          />
+        </div>
         {userDropdownOpen && (
           <ul className={styles.dropdownMenu}>
             <li onClick={userLogout}>

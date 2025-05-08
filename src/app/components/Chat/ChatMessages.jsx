@@ -6,7 +6,7 @@ import rehypeHighlight from 'rehype-highlight';
 // import { LuRefreshCcw } from 'react-icons/lu'
 import { SiRobotframework } from "react-icons/si";
 import { useSelector } from 'react-redux';
-import { FaPen } from 'react-icons/fa6';
+import { FaAnglesDown, FaPen } from 'react-icons/fa6';
 import { MdOutlineSaveAlt } from 'react-icons/md';
 import { Document, Page, Text, View, StyleSheet, pdf, Image } from '@react-pdf/renderer';
 import { saveAs } from 'file-saver';
@@ -25,9 +25,30 @@ const ChatMessages = ({
   const messages = useSelector((state) => state.chat.messages);
   const messageRefs = useRef([]);
   const pyqMessageRefs = useRef([]);
-  const [isInitialLoad, setIsInitialLoad] = useState(true)
+  // const [isInitialLoad, setIsInitialLoad] = useState(true)
   const [visibleOptions, setVisibleOptions] = useState(messages.map(() => true));
+  const [showScrollDown, setShowScrollDown] = useState(false);
   const { selectedSession } = useSelector((state) => state.chat);
+
+  const handleScroll = () => {
+    const el = chatBodyRef.current;
+    if (!el) return;
+
+    const isAtBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 10;
+    setShowScrollDown(!isAtBottom);
+  };
+
+  useEffect(() => {
+    const el = chatBodyRef.current;
+    if (!el) return;
+
+    el.addEventListener('scroll', handleScroll);
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    handleScroll(); // check if we're at bottom after new messages
+  }, [messages]);
 
   useEffect(() => {
     setVisibleOptions(prev => {
@@ -214,15 +235,16 @@ const ChatMessages = ({
   // };
 
 
-  useEffect(() => {
-    if (chatBodyRef.current && messages.length > 0 && isInitialLoad) {
-      chatBodyRef.current.scrollTo({
-        top: chatBodyRef.current.scrollHeight,
-        behavior: "smooth",
-      });
-      setIsInitialLoad(false)
-    }
-  }, [messages]);
+  // Scroll to the bottom of the chat body when initial load
+  // useEffect(() => {
+  //   if (chatBodyRef.current && messages.length > 0 && isInitialLoad) {
+  //     chatBodyRef.current.scrollTo({
+  //       top: chatBodyRef.current.scrollHeight,
+  //       behavior: "smooth",
+  //     });
+  //     setIsInitialLoad(false)
+  //   }
+  // }, [messages]);
 
   useEffect(() => {
     if (chatBodyRef.current && responseLoading) {
@@ -233,7 +255,8 @@ const ChatMessages = ({
     }
   }, [messages.length, responseLoading]);
 
-  // useEffect(() => { // to scroll to bottom when ended generating
+  // to scroll to bottom when ended generating
+  // useEffect(() => { 
   //   if (chatBodyRef.current && !responseLoading) {
   //     chatBodyRef.current.scrollTo({
   //       top: chatBodyRef.current.scrollHeight,
@@ -326,9 +349,9 @@ const ChatMessages = ({
                 className={`${styles.message} ${message.role === 'user' ? styles.userMessage : styles.aiMessage}`}
               >
                 <div
-                 className={styles.messageContent}
-                 ref={el => pyqMessageRefs.current[index] = el}
-                 >
+                  className={styles.messageContent}
+                  ref={el => pyqMessageRefs.current[index] = el}
+                >
                   {message.role === 'user' ? (
                     <ReactMarkdown
                       children={message.content}
@@ -441,6 +464,21 @@ const ChatMessages = ({
           </div>
         )
       )}
+
+      {showScrollDown && (
+        <button
+          className={styles.scrollDownBtn}
+          onClick={() => {
+            chatBodyRef.current?.scrollTo({
+              top: chatBodyRef.current.scrollHeight,
+              behavior: 'smooth',
+            });
+          }}
+        >
+          <FaAnglesDown size={20} />
+        </button>
+      )}
+
 
     </div>
   );
