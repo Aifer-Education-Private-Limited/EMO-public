@@ -50,8 +50,12 @@ const ChatTabs = ({ currentMode, userDetails }) => {
             {/* {userDetails.name?.split(" ")[0]} */}
           </h6>
           <img
-            src='/circleavatar.png'
-            alt='avatar'
+            src={`https://awstrialfileuploads.s3.ap-south-1.amazonaws.com/DP/${userDetails.id}.jpg`}
+            onError={(e) => {
+              e.target.onerror = null;
+              e.target.src = '/circleavatar.png';
+            }}
+            alt={userDetails.name}
             className={`${styles.avatar} d-none d-lg-flex`}
           />
         </div>

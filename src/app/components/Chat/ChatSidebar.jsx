@@ -195,12 +195,19 @@ const ChatSidebar = ({
                         />
                     </Link>
                     <div className={styles.userAvatar}>
-                        <img onClick={toggleUserDropdown} src='/circleavatar.png' alt='avatar' className={`${styles.avatar} d-md-none`} />
+                        <img onClick={toggleUserDropdown}
+                            src={`https://awstrialfileuploads.s3.ap-south-1.amazonaws.com/DP/${userDetails.id}.jpg`}
+                            onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = '/circleavatar.png';
+                            }}
+                            alt={userDetails.name}
+                            className={`${styles.avatar} d-md-none`} />
                         <h6
                             className={`${styles.userName} mt-2 ms-2 d-md-none`}
                             onClick={toggleUserDropdown}
                         >
-                            {userDetails ? userDetails.name?.split(" ")[0] : "Account"} 
+                            {userDetails ? userDetails.name?.split(" ")[0] : "Account"}
                             {userDropdownOpen ? <IoChevronUp /> : <IoChevronDown />}
                         </h6>
                         {userDropdownOpen && (
