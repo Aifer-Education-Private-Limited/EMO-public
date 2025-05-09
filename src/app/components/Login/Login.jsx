@@ -70,6 +70,7 @@ const Login = ({ handleClose, URL }) => {
                     setLoading(false);
                     setIsOtpSend(true)
                     setOtpOrderId(data.orderId);
+                    setError("")
                 }
             }
         } catch (err) {

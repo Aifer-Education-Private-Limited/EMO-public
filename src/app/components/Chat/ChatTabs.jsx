@@ -40,14 +40,13 @@ const ChatTabs = ({ currentMode, userDetails }) => {
           >PYQ</button>
         </div>
 
-        <div className='d-inline-flex'>
+        <div 
+          onClick={toggleUserDropdown}
+        className='d-inline-flex'>
           <h6
             className={`${styles.userName} mt-2 me-2 d-none d-md-flex`}
-            onClick={toggleUserDropdown}
           >
             {userDetails ? userDetails.name?.split(" ")[0] : "Account"}
-            {userDropdownOpen ? <IoChevronUp size={20} /> : <IoChevronDown size={20} />}
-            {/* {userDetails.name?.split(" ")[0]} */}
           </h6>
           <img
             src={`https://awstrialfileuploads.s3.ap-south-1.amazonaws.com/DP/${userDetails.id}.jpg`}
@@ -58,6 +57,9 @@ const ChatTabs = ({ currentMode, userDetails }) => {
             alt={userDetails.name}
             className={`${styles.avatar} d-none d-lg-flex`}
           />
+          <span
+          style={{cursor: "pointer"}}
+           className='mt-2 ms-2 d-none d-md-flex'>{userDropdownOpen ? <IoChevronUp size={20} /> : <IoChevronDown size={20} />}</span>
         </div>
         {userDropdownOpen && (
           <ul className={styles.dropdownMenu}>

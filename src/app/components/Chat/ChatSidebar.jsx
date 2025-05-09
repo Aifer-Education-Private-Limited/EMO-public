@@ -207,7 +207,7 @@ const ChatSidebar = ({
                             className={`${styles.userName} mt-2 ms-2 d-md-none`}
                             onClick={toggleUserDropdown}
                         >
-                            {userDetails ? userDetails.name?.split(" ")[0] : "Account"}
+                            {userDetails ? userDetails.name?.split(" ")[0] : "Account"} &nbsp;
                             {userDropdownOpen ? <IoChevronUp /> : <IoChevronDown />}
                         </h6>
                         {userDropdownOpen && (
