@@ -41,11 +41,13 @@ const ChatTabs = ({ currentMode, userDetails }) => {
         </div>
 
         <div className='d-inline-flex'>
-          <h6 
-          className={`${styles.userName} mt-2 me-2 d-none d-md-flex`}
-          onClick={toggleUserDropdown}
+          <h6
+            className={`${styles.userName} mt-2 me-2 d-none d-md-flex`}
+            onClick={toggleUserDropdown}
           >
-            {userDetails ? userDetails.name : ""} {userDropdownOpen ? <IoChevronUp size={20} /> :<IoChevronDown size={20} />}
+            {userDetails ? userDetails.name?.split(" ")[0] : "Account"}
+            {userDropdownOpen ? <IoChevronUp size={20} /> : <IoChevronDown size={20} />}
+            {/* {userDetails.name?.split(" ")[0]} */}
           </h6>
           <img
             src='/circleavatar.png'
