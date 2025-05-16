@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './Chat.module.css';
-import { IoChevronDown, IoChevronUp, IoClose, IoSearchSharp } from "react-icons/io5";
-import { SiBookstack } from "react-icons/si";
+import { IoChevronDown, IoChevronUp, IoClose } from "react-icons/io5";
+import { FaRegCircleQuestion } from "react-icons/fa6";
+import { MdOutlineMessage } from "react-icons/md";
 import { BiDotsHorizontalRounded } from "react-icons/bi";
 import Link from 'next/link';
 import { useSelector } from 'react-redux';
@@ -141,7 +142,7 @@ const ChatSidebar = ({
                     />
                 ) : (
                     <span className={styles.chatTitle}>
-                        {chat.mode === "search" ? <IoSearchSharp /> : <SiBookstack />} {chat.title}
+                        {chat.mode === "search" ? <MdOutlineMessage /> : <FaRegCircleQuestion />} {chat.title}
                     </span>
                 )}
             </span>
