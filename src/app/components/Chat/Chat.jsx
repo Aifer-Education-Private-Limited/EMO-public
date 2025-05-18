@@ -6,7 +6,7 @@ import ChatTabs from './ChatTabs';
 import ChatMessages from './ChatMessages';
 import ChatInput from './ChatInput';
 import Link from 'next/link';
-import { fetchEventSource } from '@microsoft/fetch-event-source';
+// import { fetchEventSource } from '@microsoft/fetch-event-source';
 import axios from 'axios';
 // import { Toast } from 'bootstrap';
 import aiferAxios from '../../constants/axios'
@@ -54,12 +54,14 @@ const Chat = () => {
   const [toasts, setToasts] = useState({ errorToast: null, successToast: null });
   const searchInputRef = useRef(null);
   const sidebarRef = useRef(null);
+  let isInitialChunk = true;
 
   // const [isRegenerating, setIsRegenerating] = useState(false)
 
   const router = useRouter()
 
   const resultRef = useRef("")
+  const workerRef = useRef(null)
   let codeBlockStarted;
   let codeBlockTracker;
   let newLineTracker;
@@ -94,12 +96,14 @@ const Chat = () => {
     if (currentMode === "search") {
       setSearchQuery("");
 
-      await fetchData(
-        searchQuery,
-        selectedSessionId || 1, // repalce with actual session id
-        currentMode,
-        messages
-      )
+      // await fetchData(
+      //   searchQuery,
+      //   selectedSessionId || 1, // repalce with actual session id
+      //   currentMode,
+      //   messages
+      // )
+      const sessionId = selectedSessionId || 1;
+      startStreaming(searchQuery, sessionId, currentMode, messages);
     } else if (
       currentMode === "pyq") {
       setShowPopularQuestions(true)
@@ -113,144 +117,210 @@ const Chat = () => {
     // }
   }
 
-  async function fetchData(userQuery, id, mode, prevChat, isRegenerating) {
-    setResponseLoading(true)
-    const question = { content: userQuery, role: "user" };
-    const updatedChatList = [...(prevChat ?? messages), question];
+  const startStreaming = (userQuery, sessionId, mode, prevMessages) => {
+    
+        const question = { content: userQuery, role: "user" };
+    // const updatedChatList = [...(prevChat ?? messages), question];
+    dispatch(addMessage(question));
+    const url =
+      mode === 'pyq'
+        ? 'https://vector.mymeet.link/api/v1/vector/aifer/search'
+        : 'https://aiferv2.mymeet.link/api/v1/stream/aifer-mithra/';
 
-    // console.log(isRegenerating ? "true" : "false");
-    // console.log(messages);
-
-
-    if (!isRegenerating) {
-      dispatch(addMessage(question));
-    }
-
-    const controller = new AbortController();
-
-    const serverBaseURL1 =
-      mode === "pyq"
-        ? "https://vector.mymeet.link/api/v1/vector/aifer/search"
-        : "https://aiferv2.mymeet.link/api/v1/stream/aifer-mithra/";
-
-    const email_id = localStorage.getItem("email");
+    const email_id = localStorage.getItem('email');
 
     const body = {
       email_id,
       stream: true,
-      messages: updatedChatList,
-      ref_id: id,
+      messages: [...prevMessages, { role: 'user', content: userQuery }],
+      ref_id: sessionId,
     };
 
-    await fetchEventSource(serverBaseURL1, {
-      signal: controller.signal,
-      method: "POST",
-      body: JSON.stringify(body),
-      headers: {
-        Accept: "*/*",
-        authority: "chat.openai.com",
-        "accept-language": "en-US,en;q=0.9,ml;q=0.8",
-        "Content-Type": "application/json",
-      },
-      async onopen(res) {
-        if (res.ok && res.status === 200) {
-        } else if (res.status >= 400 && res.status < 500 && res.status !== 429) {
-          controller.abort();
-        }
-      },
-      onmessage(event) {
-        if (event.data === "``") {
-          codeBlockTracker = "``";
-        } else if (event.data === "`") {
-          codeBlockTracker = `${codeBlockTracker}\``;
-        } else if (event.data === "```") {
-          codeBlockTracker = "```";
-        } else if (codeBlockTracker === "```") {
-          codeBlockStarted = !codeBlockStarted;
-          if (event.data != "") {
-            event.data = "";
-          }
-          resultRef.current = resultRef.current.replace(
-            "```",
-            codeBlockStarted
-              ? '<div class="code-snippet"><p class="code-copy"></p><pre><code class="language-markup">'
-              : "</code></pre></div>"
-          );
-          codeBlockTracker = undefined;
-        } else {
-          codeBlockTracker = undefined;
-        }
-
-        if (codeBlockStarted && event.data === "" && !codeBlockTracker) {
-          event.data = "\n";
-        }
-
-        if (event.data.includes("<")) {
-          event.data = event.data.replaceAll("<", "&lt;");
-        }
-
-        if (event.data.includes(">")) {
-          event.data = event.data.replaceAll(">", "&gt;");
-        }
-
-        if (event.data === "") {
-          if (newLineTracker === "") {
-            event.data = "\n\n";
-            newLineTracker = undefined;
-          } else {
-            newLineTracker = "";
-          }
-        } else {
-          newLineTracker = undefined;
-        }
-        if (event.data !== "[DONE]") {
-          if (codeBlockStarted) {
-            if (
-              resultRef.current.substring(resultRef.current.length - 19) ===
-              "</code></pre></div>"
-            ) {
-              const sliced = resultRef.current.slice(
-                0,
-                resultRef.current.length - 19
-              );
-              resultRef.current = sliced;
-            }
-          }
-          resultRef.current = (resultRef.current ?? "") + event.data ?? "";
-          const respondedChatItem = {
-            content: resultRef.current,
-            role: "assistant-remote",
-          };
-
-          if (resultRef.current.length === event.data.length && event.data.trim() !== "") {
-            dispatch(addMessage(respondedChatItem));
-          } else {
-            dispatch(updateLastAssistantMessage(resultRef.current));
-          }
-
-        } else {
-          const finalMessages = [
-            ...updatedChatList,
-            { content: resultRef.current, role: "assistant-remote" },
-          ];
-
-          saveMessages(finalMessages);
-
-          resultRef.current = "";
-          controller.abort();
-        }
-      },
-      onclose() {
-        resultRef.current = "";
-        controller.abort();
-      },
-      // onerror(err) {
-      //   console.log("There was an error from the server", err);
-      // },
+    const worker = new Worker(new URL('../../../workers/streamWorker.js', import.meta.url), {
+      type: 'module',
     });
+    
+    
+    workerRef.current = worker;
+    
+    worker.onmessage = (e) => {
+      const { type, chunk, error } = e.data;
 
-    setResponseLoading(false)
-  }
+      let line = chunk;
+      
+      if (type === 'data') {
+        
+        if (isInitialChunk) {
+          dispatch(addMessage({ content: line, role: 'assistant-remote' }));
+          isInitialChunk = false;
+          
+        } else {
+          
+          resultRef.current += line;
+          dispatch(updateLastAssistantMessage(resultRef.current));
+        }
+      } else if (type === 'done') {
+        const finalMessages = [
+          ...prevMessages,
+          { content: userQuery, role: 'user' },
+          {content: resultRef.current, role: 'assistant-remote'},
+         ];
+        saveMessages(finalMessages)
+        // console.log(finalMessages);
+        
+        resultRef.current = '';
+        workerRef.current?.terminate();
+        workerRef.current = null;
+        setResponseLoading(false)
+      } else if (type === 'error') {
+        console.error('Stream error:', error);
+        workerRef.current?.terminate();
+        workerRef.current = null;
+      }
+    };
+    worker.postMessage({ url, body });
+  };
+
+  // async function fetchData(userQuery, id, mode, prevChat, isRegenerating) {
+  //   setResponseLoading(true)
+  //   const question = { content: userQuery, role: "user" };
+  //   const updatedChatList = [...(prevChat ?? messages), question];
+
+  //   // console.log(isRegenerating ? "true" : "false");
+  //   // console.log(messages);
+
+
+  //   if (!isRegenerating) {
+  //     dispatch(addMessage(question));
+  //   }
+
+  //   const controller = new AbortController();
+
+  //   const serverBaseURL1 =
+  //     mode === "pyq"
+  //       ? "https://vector.mymeet.link/api/v1/vector/aifer/search"
+  //       : "https://aiferv2.mymeet.link/api/v1/stream/aifer-mithra/";
+
+  //   const email_id = localStorage.getItem("email");
+
+  //   const body = {
+  //     email_id,
+  //     stream: true,
+  //     messages: updatedChatList,
+  //     ref_id: id,
+  //   };
+
+  //   await fetchEventSource(serverBaseURL1, {
+  //     signal: controller.signal,
+  //     method: "POST",
+  //     body: JSON.stringify(body),
+  //     headers: {
+  //       Accept: "*/*",
+  //       authority: "chat.openai.com",
+  //       "accept-language": "en-US,en;q=0.9,ml;q=0.8",
+  //       "Content-Type": "application/json",
+  //     },
+  //     async onopen(res) {
+  //       if (res.ok && res.status === 200) {
+  //       } else if (res.status >= 400 && res.status < 500 && res.status !== 429) {
+  //         controller.abort();
+  //       }
+  //     },
+  //     onmessage(event) {
+  //       if (event.data === "``") {
+  //         codeBlockTracker = "``";
+  //       } else if (event.data === "`") {
+  //         codeBlockTracker = `${codeBlockTracker}\``;
+  //       } else if (event.data === "```") {
+  //         codeBlockTracker = "```";
+  //       } else if (codeBlockTracker === "```") {
+  //         codeBlockStarted = !codeBlockStarted;
+  //         if (event.data != "") {
+  //           event.data = "";
+  //         }
+  //         resultRef.current = resultRef.current.replace(
+  //           "```",
+  //           codeBlockStarted
+  //             ? '<div class="code-snippet"><p class="code-copy"></p><pre><code class="language-markup">'
+  //             : "</code></pre></div>"
+  //         );
+  //         codeBlockTracker = undefined;
+  //       } else {
+  //         codeBlockTracker = undefined;
+  //       }
+
+  //       if (codeBlockStarted && event.data === "" && !codeBlockTracker) {
+  //         event.data = "\n";
+  //       }
+
+  //       if (event.data.includes("<")) {
+  //         event.data = event.data.replaceAll("<", "&lt;");
+  //       }
+
+  //       if (event.data.includes(">")) {
+  //         event.data = event.data.replaceAll(">", "&gt;");
+  //       }
+
+  //       if (event.data === "") {
+  //         if (newLineTracker === "") {
+  //           event.data = "\n\n";
+  //           newLineTracker = undefined;
+  //         } else {
+  //           newLineTracker = "";
+  //         }
+  //       } else {
+  //         newLineTracker = undefined;
+  //       }
+  //       if (event.data !== "[DONE]") {
+  //         if (codeBlockStarted) {
+  //           if (
+  //             resultRef.current.substring(resultRef.current.length - 19) ===
+  //             "</code></pre></div>"
+  //           ) {
+  //             const sliced = resultRef.current.slice(
+  //               0,
+  //               resultRef.current.length - 19
+  //             );
+  //             resultRef.current = sliced;
+  //           }
+  //         }
+  //         resultRef.current = (resultRef.current ?? "") + event.data ?? "";
+  //         const respondedChatItem = {
+  //           content: resultRef.current,
+  //           role: "assistant-remote",
+  //         };
+
+  //         if (resultRef.current.length === event.data.length && event.data.trim() !== "") {
+  //           dispatch(addMessage(respondedChatItem));
+  //         } else {
+  //           dispatch(updateLastAssistantMessage(resultRef.current));
+  //         }
+
+  //       } else {
+  //         const finalMessages = [
+  //           ...updatedChatList,
+  //           { content: resultRef.current, role: "assistant-remote" },
+  //         ];
+
+  //         saveMessages(finalMessages);
+
+  //         resultRef.current = "";
+  //         controller.abort();
+  //       }
+  //     },
+  //     onclose() {
+  //       if (isTabVisible) {
+  //         resultRef.current = "";
+  //       }
+  //       controller.abort();
+  //     },
+  //     // onerror(err) {
+  //     //   console.log("There was an error from the server", err);
+  //     // },
+  //   });
+
+  //   setResponseLoading(false)
+  // }
 
   const createNewSession = async (messages) => {
     try {
@@ -336,9 +406,7 @@ const Chat = () => {
         dispatch(incrementChatCountToday())
       }
 
-    } catch (error) {
-      console.error("Failed to save messages", error);
-    }
+    } catch (error) {}
   };
 
 
