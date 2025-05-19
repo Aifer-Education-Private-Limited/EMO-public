@@ -1,5 +1,3 @@
-// src/workers/streamWorker.ts
-
 self.onmessage = async (e) => {
     const { url, body } = e.data;
 
@@ -23,7 +21,6 @@ self.onmessage = async (e) => {
         let buffer = '';
         let done = false;
         let newLineTracker;
-        let lineCount = 0;
 
         while (!done) {
             const { value, done: readerDone } = await reader.read();
@@ -35,35 +32,39 @@ self.onmessage = async (e) => {
             buffer += decoder.decode(value || new Uint8Array(), { stream: true });
 
             const lines = buffer.split('\n');
-            buffer = lines.pop() ?? ''; // Keep the last line (incomplete) for next time
+            buffer = lines.pop() ?? '';
 
             for (let line of lines) {
-                lineCount += 1;
                 line = line.trim();
-                // if (!line.startsWith('data: ')) continue;
+
+                // console.log(line);
+
+                // let content = line;
+                // if (content.startsWith('data: ')) {
+                    let content = line.slice(6); // remove "data:" and keep space only if in text
+                // }
+
+                // console.log(content);
                 
-                let content = line.slice(6); // remove "data:" and keep space only if in text
-                
-                
-                
+
                 if (content === '[DONE]') {
                     self.postMessage({ type: 'done' });
                     done = true;
                     break;
                 }
-                
+
                 // console.log(content);
 
                 if (content === "") {
                     if (newLineTracker === "") {
-                      content = "\n\n";
-                      newLineTracker = undefined;
+                        content = "\n\n";
+                        newLineTracker = undefined;
                     } else {
-                      newLineTracker = "";
+                        newLineTracker = "";
                     }
-                  } else {
+                } else {
                     newLineTracker = undefined;
-                  }
+                }
 
                 self.postMessage({ type: 'data', chunk: content });
             }
@@ -74,4 +75,4 @@ self.onmessage = async (e) => {
 };
 
 
-export { }; // <- Important for TypeScript to treat this as a module
+export { }
